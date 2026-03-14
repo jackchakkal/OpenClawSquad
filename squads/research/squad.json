@@ -1,0 +1,11 @@
+{
+  "name": "research",
+  "description": "Squad de pesquisa profunda",
+  "agents": ["coordinator", "researcher", "strategist"],
+  "pipeline": [
+    {"agent": "coordinator", "action": "define", "checkpoint": true},
+    {"agent": "researcher", "action": "investigate", "input": "query"},
+    {"agent": "strategist", "action": "synthesize", "input": "researcher"},
+    {"agent": "coordinator", "action": "present", "checkpoint": true}
+  ]
+}
