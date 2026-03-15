@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oeste Seminovos - Vitrine de Carros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tagline {
+            background: #0f3460;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .info-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .info-section h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid #e94560;
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .feature h3 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .location-box {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .location-box h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .location-box .city {
+            font-size: 1.8em;
+            color: #e94560;
+            font-weight: bold;
+        }
+        
+        .contact-section {
+            background: #e94560;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .contact-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: #e94560;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .website {
+            margin-top: 20px;
+            font-size: 1.3em;
+        }
+        
+        .website a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 2px dashed white;
+            padding-bottom: 3px;
+        }
+        
+        .footer {
+            background: #1a1a2e;
+            color: #888;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .car-showcase {
+            padding: 30px;
+            background: white;
+        }
+        
+        .car-showcase h2 {
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .car-placeholder {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            aspect-ratio: 4/3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .car-placeholder-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .car-placeholder p {
+            color: #666;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .features {
+                grid-template-columns: 1fr;
+            }
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🟢 Oeste Seminovos</h1>
+            <p class="subtitle">A maior vitrine de seminovos do Oeste da Bahia</p>
+        </header>
+        
+        <div class="tagline">
+            ✨ <strong>Mais de 500 carros</strong> das melhores concessionárias da região em um só lugar!
+        </div>
+        
+        <section class="info-section">
+            <h2>O Que Fazemos</h2>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🚗</div>
+                    <h3>Vitrine Virtual</h3>
+                    <p>Anúncios de carros seminovos das principais concessionárias da região</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Parcerias</h3>
+                    <p>Concessionárias parceiras anunciam através de representantes</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Variedade</h3>
+                    <p>Encontre carros de todas as marcas, modelos e preços</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <h3>Melhores Ofertas</h3>
+                    <p>Compare opções e encontre o melhor negócio para você</p>
+                </div>
+            </div>
+            
+            <div class="location-box">
+                <h3>📍 Estamos em</h3>
+                <p class="city">Barreiras - Bahia</p>
+                <p>Servindo todo o Oeste da Bahia</p>
+            </div>
+        </section>
+        
+        <section class="car-showcase">
+            <h2>🚙 Nossos Anúncios</h2>
+            <div class="car-grid">
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🚙</div>
+                    <p>SUVs</p>
+                </div>
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🚘</div>
+                    <p>Sedans</p>
+                </div>
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🛻</div>
+                    <p>Picapes</p>
+                </div>
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🚕</div>
+                    <p>Hatches</p>
+                </div>
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🚐</div>
+                    <p>Utilitários</p>
+                </div>
+                <div class="car-placeholder">
+                    <div class="car-placeholder-icon">🏎️</div>
+                    <p>Esportivos</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="contact-section">
+            <h2>📞 Fale Conosco</h2>
+            <div class="contact-buttons">
+                <a href="tel:77999918420" class="contact-btn">
+                    📱 Ligar Agora
+                </a>
+                <a href="https://wa.me/5577999918420" class="contact-btn">
+                    💬 WhatsApp
+                </a>
+            </div>
+            <div class="website">
+                🌐 <a href="https://www.oesteseminovos.com.br" target="_blank">www.oesteseminovos.com.br</a>
+            </div>
+        </section>
+        
+        <footer class="footer">
+            <p>© 2025 Oeste Seminovos - Todos os direitos reservados</p>
+            <p>Barreiras - Bahia | O maior catálogo de seminovos da região</p>
+        </footer>
+    </div>
+</body>
+</html>
