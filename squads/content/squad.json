@@ -1,0 +1,13 @@
+{
+  "name": "content",
+  "description": "Squad de criação de conteúdo",
+  "agents": ["coordinator", "researcher", "writer", "reviewer"],
+  "pipeline": [
+    {"agent": "coordinator", "action": "brief", "checkpoint": true},
+    {"agent": "researcher", "action": "gather", "input": "topic"},
+    {"agent": "strategist", "action": "plan", "input": "researcher"},
+    {"agent": "writer", "action": "create", "input": "strategist"},
+    {"agent": "reviewer", "action": "edit", "input": "writer"},
+    {"agent": "coordinator", "action": "deliver", "checkpoint": true}
+  ]
+}
