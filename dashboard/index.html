@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClawSquad - Escritório Virtual 2D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #14141f;
+            --accent: #00d4ff;
+            --accent-dim: #00d4ff33;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --text: #ffffff;
+            --text-dim: #8888aa;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--accent-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--accent), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge.online {
+            background: var(--success);
+            color: #000;
+        }
+
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            padding: 20px;
+            border-right: 1px solid var(--accent-dim);
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .agent-item {
+            padding: 12px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .agent-item:hover {
+            border-color: var(--accent);
+        }
+
+        .agent-item.active {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .agent-item .name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .agent-item .status {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        .agent-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .office {
+            flex: 1;
+            position: relative;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--accent-dim) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #00ff8833 0%, transparent 50%),
+                var(--bg-dark);
+        }
+
+        .office-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--accent-dim) 1px, transparent 1px),
+                linear-gradient(90deg, var(--accent-dim) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        .agents-on-office {
+            position: absolute;
+            inset: 0;
+            padding: 40px;
+        }
+
+        .agent-avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px var(--accent-dim);
+        }
+
+        .agent-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px var(--accent);
+        }
+
+        .agent-avatar .icon {
+            font-size: 30px;
+        }
+
+        .agent-avatar .label {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .agent-avatar .status-dot {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+
+        .agent-avatar .status-dot.idle { background: var(--text-dim); }
+        .agent-avatar .status-dot.working { background: var(--warning); animation: pulse 1s infinite; }
+        .agent-avatar .status-dot.done { background: var(--success); }
+        .agent-avatar .status-dot.error { background: var(--error); }
+
+        .activity-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .activity-panel h3 {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .activity-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--accent-dim);
+            font-size: 13px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .time {
+            color: var(--text-dim);
+            font-size: 11px;
+            min-width: 60px;
+        }
+
+        .activity-item .message {
+            flex: 1;
+        }
+
+        .squad-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .squad-btn {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-dim);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .squad-btn:hover, .squad-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .agent-detail {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+            display: none;
+        }
+
+        .agent-detail.show {
+            display: block;
+        }
+
+        .agent-detail h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .agent-detail .role {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .agent-detail .task {
+            background: var(--bg-dark);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .agent-detail .task-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🦞</div>
+            <h1>OpenClawSquad</h1>
+        </div>
+        <div class="status-badge online">
+            <span class="dot"></span>
+            Online
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="sidebar">
+            <h2>Agentes</h2>
+            <div class="agent-list" id="agentList"></div>
+        </aside>
+
+        <div class="office">
+            <div class="office-grid"></div>
+            <div class="agents-on-office" id="office"></div>
+
+            <div class="squad-selector">
+                <button class="squad-btn active" data-squad="content">Content Squad</button>
+                <button class="squad-btn" data-squad="security">Security Squad</button>
+                <button class="squad-btn" data-squad="data">Data Squad</button>
+            </div>
+
+            <div class="agent-detail" id="agentDetail">
+                <h3 id="detailName">Agente</h3>
+                <p class="role" id="detailRole">Papel</p>
+                <div class="task">
+                    <div class="task-label">Tarefa atual:</div>
+                    <div id="detailTask">-</div>
+                </div>
+            </div>
+
+            <div class="activity-panel">
+                <h3>Atividade Recente</h3>
+                <div id="activityList"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dados dos agentes
+        const agents = {
+            content: [
+                { id: 'coordinator', name: 'Coordinator', icon: '🎯', role: 'Coordenação', status: 'working', task: 'Gerenciando pipeline de conteúdo' },
+                { id: 'researcher', name: 'Rodrigo Referencia', icon: '🔍', role: 'Pesquisa', status: 'done', task: 'Pesquisando tendências de AI' },
+                { id: 'strategist', name: 'Sofia Estratégia', icon: '🧠', role: 'Estratégia', status: 'idle', task: 'Aguardando briefing' },
+                { id: 'writer', name: 'Wanda Writer', icon: '✍️', role: 'Redação', status: 'idle', task: 'Aguardando estratégia' },
+                { id: 'designer', name: 'Diego Design', icon: '🎨', role: 'Design', status: 'idle', task: 'Aguardando brief' },
+                { id: 'reviewer', name: 'Renata Revisão', icon: '✅', role: 'Revisão', status: 'idle', task: 'Aguardando conteúdo' }
+            ],
+            security: [
+                { id: 'pentester', name: 'Pedro Penetração', icon: '🛡️', role: 'Pentest', status: 'idle', task: 'Aguardando alvo' },
+                { id: 'auditor', name: 'Sandra Segurança', icon: '🔐', role: 'Auditoria', status: 'idle', task: 'Aguardando escopo' },
+                { id: 'bughunter', name: 'Bianca Bug', icon: '🐛', role: 'Bug Hunt', status: 'idle', task: 'Aguardando aplicação' }
+            ],
+            data: [
+                { id: 'analyst', name: 'Dante Dados', icon: '📊', role: 'Análise', status: 'idle', task: 'Aguardando dados' },
+                { id: 'visualizer', name: 'Vitor Visual', icon: '📈', role: 'Visualização', status: 'idle', task: 'Aguardando análise' }
+            ]
+        };
+
+        const positions = {
+            content: [
+                { x: 150, y: 100 },
+                { x: 350, y: 80 },
+                { x: 550, y: 120 },
+                { x: 200, y: 280 },
+                { x: 400, y: 300 },
+                { x: 600, y: 260 }
+            ],
+            security: [
+                { x: 200, y: 150 },
+                { x: 400, y: 120 },
+                { x: 550, y: 200 }
+            ],
+            data: [
+                { x: 250, y: 150 },
+                { x: 500, y: 150 }
+            ]
+        };
+
+        let currentSquad = 'content';
+        let activities = [];
+
+        // Funções de renderização
+        function renderSidebar() {
+            const list = document.getElementById('agentList');
+            const squadAgents = agents[currentSquad];
+            
+            list.innerHTML = squadAgents.map(agent => `
+                <div class="agent-item" data-id="${agent.id}">
+                    <div class="name">
+                        <div class="agent-icon" style="background: var(--accent-dim)">${agent.icon}</div>
+                        ${agent.name}
+                    </div>
+                    <div class="status">${agent.status === 'working' ? '🟡Trabalhando' : agent.status === 'done' ? '🟢Concluído' : '⚪Aguardando'}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderOffice() {
+            const office = document.getElementById('office');
+            const squadAgents = agents[currentSquad];
+            const squadPositions = positions[currentSquad];
+            
+            office.innerHTML = squadAgents.map((agent, i) => {
+                const pos = squadPositions[i];
+                return `
+                    <div class="agent-avatar" style="left: ${pos.x}px; top: ${pos.y}px" 
+                          data-id="${agent.id}"
+                          onmouseover="showAgentDetail('${agent.id}')"
+                          onmouseout="hideAgentDetail()">
+                        <span class="icon">${agent.icon}</span>
+                        <span class="label">${agent.name.split(' ')[0]}</span>
+                        <span class="status-dot ${agent.status}"></span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderActivity() {
+            const list = document.getElementById('activityList');
+            if (activities.length === 0) {
+                list.innerHTML = '<div class="activity-item"><span class="time">--:--</span><span class="message">Nenhuma atividade ainda</span></div>';
+                return;
+            }
+            
+            list.innerHTML = activities.slice(-10).reverse().map(a => `
+                <div class="activity-item">
+                    <span class="time">${a.time}</span>
+                    <span class="message">${a.message}</span>
+                </div>
+            `).join('');
+        }
+
+        function showAgentDetail(id) {
+            const squadAgents = agents[currentSquad];
+            const agent = squadAgents.find(a => a.id === id);
+            if (!agent) return;
+            
+            document.getElementById('detailName').textContent = agent.name;
+            document.getElementById('detailRole').textContent = agent.role;
+            document.getElementById('detailTask').textContent = agent.task;
+            document.getElementById('agentDetail').classList.add('show');
+        }
+
+        function hideAgentDetail() {
+            document.getElementById('agentDetail').classList.remove('show');
+        }
+
+        // Simular atividades
+        function simulateActivity() {
+            const messages = [
+                'Iniciando pesquisa...',
+                'Analisando dados...',
+                'Gerando conteúdo...',
+                'Revisando output...',
+                'Processando...',
+                'Concluído!'
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            const squadAgents = agents[currentSquad];
+            const randomAgent = squadAgents[Math.floor(Math.random() * squadAgents.length)];
+            
+            activities.push({
+                time,
+                message: `${randomAgent.name}: ${randomMessage}`
+            });
+            
+            if (activities.length > 50) activities.shift();
+            renderActivity();
+        }
+
+        // Event listeners
+        document.querySelectorAll('.squad-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.squad-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSquad = btn.dataset.squad;
+                renderSidebar();
+                renderOffice();
+            });
+        });
+
+        document.getElementById('agentList').addEventListener('click', (e) => {
+            const item = e.target.closest('.agent-item');
+            if (item) {
+                document.querySelectorAll('.agent-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                showAgentDetail(item.dataset.id);
+            }
+        });
+
+        // Inicialização
+        renderSidebar();
+        renderOffice();
+        renderActivity();
+
+        // Simular atividade a cada 3 segundos
+        setInterval(simulateActivity, 3000);
+
+        // Adicionar algumas atividades iniciais
+        activities = [
+            { time: '08:30', message: 'Coordinator: Squad iniciado' },
+            { time: '08:31', message: 'Rodrigo Referencia: Buscando tendências...' },
+            { time: '08:32', message: 'Sofia Estratégia: Definindo abordagem' }
+        ];
+        renderActivity();
+    </script>
+</body>
+</html>

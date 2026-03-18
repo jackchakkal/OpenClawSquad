@@ -2,7 +2,30 @@
 
 Sistema de orquestração multi-agente para automação de tarefas.
 
-## Agentes do Squad
+## 🚀 Quick Start
+
+```bash
+# Clone o repositório
+git clone https://github.com/jackchakkal/OpenClawSquad.git
+
+# Abra o Dashboard 2D
+cd dashboard && python3 -m http.server 3000
+# Acesse http://localhost:3000
+```
+
+## 📺 Escritório Virtual 2D
+
+Interface visual que mostra os agentes trabalhando em tempo real.
+
+![Dashboard](dashboard/preview.png)
+
+**Features:**
+- Visualização 2D dos agentes
+- Status em tempo real
+- Painel de atividade
+- Múltiplos squads
+
+## 📋 Agentes (27)
 
 ### 🎯 Coordenação
 | Agente | Descrição |
