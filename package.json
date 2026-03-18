@@ -1,0 +1,26 @@
+{
+  "name": "openclawsquad",
+  "version": "1.0.0",
+  "description": "Multi-agent orchestration framework - open source alternative to opensquad",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "openclawsquad": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "init": "node src/init.js",
+    "create": "node src/create-squad.js",
+    "run": "node src/run-squad.js",
+    "dashboard": "node src/dashboard-server.js"
+  },
+  "keywords": ["ai", "agents", "orchestration", "multi-agent", "squad"],
+  "author": "Jack Chakkal",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.12",
+    "yaml": "^2.3.4",
+    "ora": "^5.4.1"
+  }
+}
