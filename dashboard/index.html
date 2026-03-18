@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenClawSquad - Escritório Virtual 2D</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
             --bg-dark: #0a0a0f;
             --bg-card: #14141f;
@@ -64,25 +60,21 @@
             font-size: 24px;
         }
 
-        .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+        .connection-status {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .status-badge.online {
-            background: var(--success);
-            color: #000;
-        }
-
-        .status-badge .dot {
-            width: 8px;
-            height: 8px;
-            background: currentColor;
+        .status-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
+            background: var(--error);
+        }
+
+        .status-dot.connected {
+            background: var(--success);
             animation: pulse 2s infinite;
         }
 
@@ -219,8 +211,8 @@
             position: absolute;
             bottom: 5px;
             right: 5px;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             border: 2px solid var(--bg-card);
         }
@@ -230,6 +222,93 @@
         .agent-avatar .status-dot.done { background: var(--success); }
         .agent-avatar .status-dot.error { background: var(--error); }
 
+        .pipeline-flow {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--accent-dim);
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .pipeline-step.active {
+            color: var(--accent);
+        }
+
+        .pipeline-step.done {
+            color: var(--success);
+        }
+
+        .pipeline-arrow {
+            color: var(--accent-dim);
+        }
+
+        .checkpoint-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .checkpoint-modal.show {
+            display: flex;
+        }
+
+        .checkpoint-content {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--warning);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .checkpoint-content h2 {
+            color: var(--warning);
+            margin-bottom: 15px;
+        }
+
+        .checkpoint-content p {
+            margin-bottom: 20px;
+            color: var(--text-dim);
+        }
+
+        .checkpoint-btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+
+        .checkpoint-btn.approve {
+            background: var(--success);
+            color: #000;
+        }
+
+        .checkpoint-btn.reject {
+            background: var(--error);
+            color: #fff;
+        }
+
         .activity-panel {
             position: absolute;
             bottom: 20px;
@@ -238,7 +317,7 @@
             background: var(--bg-card);
             border-radius: 12px;
             padding: 15px;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
         }
 
@@ -264,14 +343,14 @@
         .activity-item .time {
             color: var(--text-dim);
             font-size: 11px;
-            min-width: 60px;
+            min-width: 50px;
         }
 
         .activity-item .message {
             flex: 1;
         }
 
-        .squad-selector {
+        .controls {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -279,7 +358,7 @@
             gap: 10px;
         }
 
-        .squad-btn {
+        .control-btn {
             padding: 10px 20px;
             background: var(--bg-card);
             border: 1px solid var(--accent-dim);
@@ -287,9 +366,10 @@
             color: var(--text);
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 14px;
         }
 
-        .squad-btn:hover, .squad-btn.active {
+        .control-btn:hover, .control-btn.active {
             background: var(--accent);
             color: #000;
         }
@@ -301,8 +381,9 @@
             background: var(--bg-card);
             border-radius: 12px;
             padding: 20px;
-            width: 300px;
+            width: 280px;
             display: none;
+            border: 1px solid var(--accent-dim);
         }
 
         .agent-detail.show {
@@ -311,7 +392,7 @@
 
         .agent-detail h3 {
             font-size: 18px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .agent-detail .role {
@@ -332,6 +413,45 @@
             color: var(--text-dim);
             margin-bottom: 5px;
         }
+
+        .log-console {
+            position: absolute;
+            bottom: 220px;
+            left: 20px;
+            right: 20px;
+            background: #0d0d12;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .log-console.show {
+            display: block;
+        }
+
+        .log-line {
+            padding: 2px 0;
+        }
+
+        .log-line .time {
+            color: var(--text-dim);
+        }
+
+        .log-line.agent {
+            color: var(--accent);
+        }
+
+        .log-line.system {
+            color: var(--warning);
+        }
+
+        .log-line.error {
+            color: var(--error);
+        }
     </style>
 </head>
 <body>
@@ -340,9 +460,9 @@
             <div class="logo-icon">🦞</div>
             <h1>OpenClawSquad</h1>
         </div>
-        <div class="status-badge online">
-            <span class="dot"></span>
-            Online
+        <div class="connection-status">
+            <span class="status-dot" id="wsStatus"></span>
+            <span id="wsText">Conectando...</span>
         </div>
     </header>
 
@@ -356,10 +476,19 @@
             <div class="office-grid"></div>
             <div class="agents-on-office" id="office"></div>
 
-            <div class="squad-selector">
-                <button class="squad-btn active" data-squad="content">Content Squad</button>
-                <button class="squad-btn" data-squad="security">Security Squad</button>
-                <button class="squad-btn" data-squad="data">Data Squad</button>
+            <div class="pipeline-flow" id="pipeline">
+                <div class="pipeline-step" data-step="1">🔍 Pesquisa</div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step" data-step="2">🧠 Estratégia</div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step" data-step="3">✍️ Criação</div>
+                <span class="pipeline-arrow">→</span>
+                <div class="pipeline-step" data-step="4">✅ Revisão</div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" onclick="runDemo()">▶️ Executar Squad</button>
+                <button class="control-btn" onclick="toggleConsole()">📝 Console</button>
             </div>
 
             <div class="agent-detail" id="agentDetail">
@@ -371,81 +500,104 @@
                 </div>
             </div>
 
+            <div class="log-console" id="logConsole"></div>
+
             <div class="activity-panel">
-                <h3>Atividade Recente</h3>
+                <h3>Atividade em Tempo Real</h3>
                 <div id="activityList"></div>
             </div>
         </div>
     </main>
 
+    <div class="checkpoint-modal" id="checkpointModal">
+        <div class="checkpoint-content">
+            <h2>⏸️ Checkpoint</h2>
+            <p id="checkpointMessage">Aprovação necessária para continuar</p>
+            <button class="checkpoint-btn approve" onclick="approveCheckpoint()">✅ Aprovar</button>
+            <button class="checkpoint-btn reject" onclick="rejectCheckpoint()">❌ Rejeitar</button>
+        </div>
+    </div>
+
     <script>
-        // Dados dos agentes
-        const agents = {
-            content: [
-                { id: 'coordinator', name: 'Coordinator', icon: '🎯', role: 'Coordenação', status: 'working', task: 'Gerenciando pipeline de conteúdo' },
-                { id: 'researcher', name: 'Rodrigo Referencia', icon: '🔍', role: 'Pesquisa', status: 'done', task: 'Pesquisando tendências de AI' },
-                { id: 'strategist', name: 'Sofia Estratégia', icon: '🧠', role: 'Estratégia', status: 'idle', task: 'Aguardando briefing' },
-                { id: 'writer', name: 'Wanda Writer', icon: '✍️', role: 'Redação', status: 'idle', task: 'Aguardando estratégia' },
-                { id: 'designer', name: 'Diego Design', icon: '🎨', role: 'Design', status: 'idle', task: 'Aguardando brief' },
-                { id: 'reviewer', name: 'Renata Revisão', icon: '✅', role: 'Revisão', status: 'idle', task: 'Aguardando conteúdo' }
-            ],
-            security: [
-                { id: 'pentester', name: 'Pedro Penetração', icon: '🛡️', role: 'Pentest', status: 'idle', task: 'Aguardando alvo' },
-                { id: 'auditor', name: 'Sandra Segurança', icon: '🔐', role: 'Auditoria', status: 'idle', task: 'Aguardando escopo' },
-                { id: 'bughunter', name: 'Bianca Bug', icon: '🐛', role: 'Bug Hunt', status: 'idle', task: 'Aguardando aplicação' }
-            ],
-            data: [
-                { id: 'analyst', name: 'Dante Dados', icon: '📊', role: 'Análise', status: 'idle', task: 'Aguardando dados' },
-                { id: 'visualizer', name: 'Vitor Visual', icon: '📈', role: 'Visualização', status: 'idle', task: 'Aguardando análise' }
-            ]
-        };
-
-        const positions = {
-            content: [
-                { x: 150, y: 100 },
-                { x: 350, y: 80 },
-                { x: 550, y: 120 },
-                { x: 200, y: 280 },
-                { x: 400, y: 300 },
-                { x: 600, y: 260 }
-            ],
-            security: [
-                { x: 200, y: 150 },
-                { x: 400, y: 120 },
-                { x: 550, y: 200 }
-            ],
-            data: [
-                { x: 250, y: 150 },
-                { x: 500, y: 150 }
-            ]
-        };
-
-        let currentSquad = 'content';
-        let activities = [];
-
-        // Funções de renderização
-        function renderSidebar() {
-            const list = document.getElementById('agentList');
-            const squadAgents = agents[currentSquad];
+        // WebSocket connection
+        let ws;
+        let currentAgents = [];
+        let logs = [];
+        
+        function connect() {
+            ws = new WebSocket('ws://localhost:3001');
             
-            list.innerHTML = squadAgents.map(agent => `
+            ws.onopen = () => {
+                document.getElementById('wsStatus').classList.add('connected');
+                document.getElementById('wsText').textContent = 'Conectado';
+                addLog('system', 'Conectado ao servidor');
+            };
+            
+            ws.onclose = () => {
+                document.getElementById('wsStatus').classList.remove('connected');
+                document.getElementById('wsText').textContent = 'Desconectado';
+                addLog('error', 'Conexão perdida - reconectando...');
+                setTimeout(connect, 3000);
+            };
+            
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleMessage(msg);
+            };
+        }
+
+        function handleMessage(msg) {
+            switch (msg.type) {
+                case 'init':
+                    if (msg.data.squads && msg.data.squads[0]) {
+                        loadSquad(msg.data.squads[0]);
+                    }
+                    if (msg.data.activities) {
+                        msg.data.activities.forEach(a => addActivity(a.time, a.agent, a.message));
+                    }
+                    break;
+                    
+                case 'squad_started':
+                    loadSquad(msg.data);
+                    break;
+                    
+                case 'agent_updated':
+                    updateAgentStatus(msg.data.agentId, msg.data.status, msg.data.task);
+                    break;
+                    
+                case 'activity':
+                    addActivity(msg.data.time, msg.data.agent, msg.data.message);
+                    break;
+                    
+                case 'checkpoint':
+                    showCheckpoint(msg.data);
+                    break;
+            }
+        }
+
+        function loadSquad(squad) {
+            currentAgents = squad.agents || [];
+            renderAgents();
+            addLog('system', `Squad "${squad.name}" carregado`);
+        }
+
+        function renderAgents() {
+            // Render sidebar
+            const list = document.getElementById('agentList');
+            list.innerHTML = currentAgents.map(agent => `
                 <div class="agent-item" data-id="${agent.id}">
                     <div class="name">
                         <div class="agent-icon" style="background: var(--accent-dim)">${agent.icon}</div>
                         ${agent.name}
                     </div>
-                    <div class="status">${agent.status === 'working' ? '🟡Trabalhando' : agent.status === 'done' ? '🟢Concluído' : '⚪Aguardando'}</div>
+                    <div class="status" id="status-${agent.id}">Aguardando</div>
                 </div>
             `).join('');
-        }
 
-        function renderOffice() {
+            // Render office
             const office = document.getElementById('office');
-            const squadAgents = agents[currentSquad];
-            const squadPositions = positions[currentSquad];
-            
-            office.innerHTML = squadAgents.map((agent, i) => {
-                const pos = squadPositions[i];
+            office.innerHTML = currentAgents.map((agent, i) => {
+                const pos = agent.position || { x: 100 + (i * 120), y: 150 };
                 return `
                     <div class="agent-avatar" style="left: ${pos.x}px; top: ${pos.y}px" 
                           data-id="${agent.id}"
@@ -453,35 +605,41 @@
                           onmouseout="hideAgentDetail()">
                         <span class="icon">${agent.icon}</span>
                         <span class="label">${agent.name.split(' ')[0]}</span>
-                        <span class="status-dot ${agent.status}"></span>
+                        <span class="status-dot idle" id="dot-${agent.id}"></span>
                     </div>
                 `;
             }).join('');
         }
 
-        function renderActivity() {
-            const list = document.getElementById('activityList');
-            if (activities.length === 0) {
-                list.innerHTML = '<div class="activity-item"><span class="time">--:--</span><span class="message">Nenhuma atividade ainda</span></div>';
-                return;
+        function updateAgentStatus(agentId, status, task) {
+            // Update sidebar
+            const statusEl = document.getElementById(`status-${agentId}`);
+            if (statusEl) {
+                const texts = { idle: 'Aguardando', working: 'Trabalhando', done: 'Concluído', error: 'Erro' };
+                statusEl.textContent = texts[status] || status;
             }
             
-            list.innerHTML = activities.slice(-10).reverse().map(a => `
-                <div class="activity-item">
-                    <span class="time">${a.time}</span>
-                    <span class="message">${a.message}</span>
-                </div>
-            `).join('');
+            // Update dot
+            const dotEl = document.getElementById(`dot-${agentId}`);
+            if (dotEl) {
+                dotEl.className = `status-dot ${status}`;
+            }
+            
+            // Update task
+            const taskEl = document.getElementById('detailTask');
+            if (taskEl && document.getElementById('agentDetail').classList.contains('show')) {
+                const current = currentAgents.find(a => a.id === agentId);
+                if (current) taskEl.textContent = task || current.task || '-';
+            }
         }
 
         function showAgentDetail(id) {
-            const squadAgents = agents[currentSquad];
-            const agent = squadAgents.find(a => a.id === id);
+            const agent = currentAgents.find(a => a.id === id);
             if (!agent) return;
             
             document.getElementById('detailName').textContent = agent.name;
-            document.getElementById('detailRole').textContent = agent.role;
-            document.getElementById('detailTask').textContent = agent.task;
+            document.getElementById('detailRole').textContent = agent.role || agent.title || '';
+            document.getElementById('detailTask').textContent = agent.task || '-';
             document.getElementById('agentDetail').classList.add('show');
         }
 
@@ -489,44 +647,76 @@
             document.getElementById('agentDetail').classList.remove('show');
         }
 
-        // Simular atividades
-        function simulateActivity() {
-            const messages = [
-                'Iniciando pesquisa...',
-                'Analisando dados...',
-                'Gerando conteúdo...',
-                'Revisando output...',
-                'Processando...',
-                'Concluído!'
-            ];
+        function addActivity(time, agent, message) {
+            const list = document.getElementById('activityList');
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = `<span class="time">${time}</span><span class="message">${agent}: ${message}</span>`;
+            list.insertBefore(item, list.firstChild);
             
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            const now = new Date();
-            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            if (list.children.length > 10) {
+                list.removeChild(list.lastChild);
+            }
+        }
+
+        function addLog(type, message) {
+            logs.push({ type, message, time: new Date().toLocaleTimeString() });
             
-            const squadAgents = agents[currentSquad];
-            const randomAgent = squadAgents[Math.floor(Math.random() * squadAgents.length)];
+            const console = document.getElementById('logConsole');
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            line.innerHTML = `<span class="time">[${new Date().toLocaleTimeString()}]</span> ${message}`;
+            console.insertBefore(line, console.firstChild);
+        }
+
+        function toggleConsole() {
+            document.getElementById('logConsole').classList.toggle('show');
+        }
+
+        function showCheckpoint(data) {
+            document.getElementById('checkpointMessage').textContent = data.message;
+            document.getElementById('checkpointModal').classList.add('show');
+        }
+
+        function approveCheckpoint() {
+            document.getElementById('checkpointModal').classList.remove('show');
+            ws.send(JSON.stringify({ type: 'checkpoint_response', approved: true }));
+            addLog('system', 'Checkpoint aprovado');
+        }
+
+        function rejectCheckpoint() {
+            document.getElementById('checkpointModal').classList.remove('show');
+            ws.send(JSON.stringify({ type: 'checkpoint_response', approved: false }));
+            addLog('error', 'Checkpoint rejeitado');
+        }
+
+        function runDemo() {
+            addLog('system', 'Iniciando execução do squad...');
             
-            activities.push({
-                time,
-                message: `${randomAgent.name}: ${randomMessage}`
+            // Simular pipeline
+            const steps = ['researcher', 'strategist', 'writer', 'reviewer'];
+            
+            steps.forEach((agentId, i) => {
+                setTimeout(() => {
+                    updateAgentStatus(agentId, 'working', 'Processando...');
+                    addLog('agent', `${agentId}: Executando tarefa...`);
+                    
+                    setTimeout(() => {
+                        updateAgentStatus(agentId, 'done', 'Concluído');
+                        addLog('agent', `${agentId}: Tarefa concluída!`);
+                        
+                        if (i === 0 || i === 2) {
+                            //Checkpoint after researcher and writer
+                            setTimeout(() => {
+                                showCheckpoint({ message: 'Conteúdo criado. Aprovar para continuar?' });
+                            }, 500);
+                        }
+                    }, 1500);
+                }, i * 2000);
             });
-            
-            if (activities.length > 50) activities.shift();
-            renderActivity();
         }
 
         // Event listeners
-        document.querySelectorAll('.squad-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.squad-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentSquad = btn.dataset.squad;
-                renderSidebar();
-                renderOffice();
-            });
-        });
-
         document.getElementById('agentList').addEventListener('click', (e) => {
             const item = e.target.closest('.agent-item');
             if (item) {
@@ -536,21 +726,8 @@
             }
         });
 
-        // Inicialização
-        renderSidebar();
-        renderOffice();
-        renderActivity();
-
-        // Simular atividade a cada 3 segundos
-        setInterval(simulateActivity, 3000);
-
-        // Adicionar algumas atividades iniciais
-        activities = [
-            { time: '08:30', message: 'Coordinator: Squad iniciado' },
-            { time: '08:31', message: 'Rodrigo Referencia: Buscando tendências...' },
-            { time: '08:32', message: 'Sofia Estratégia: Definindo abordagem' }
-        ];
-        renderActivity();
+        // Conectar ao iniciar
+        connect();
     </script>
 </body>
 </html>

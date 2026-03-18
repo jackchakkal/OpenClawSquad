@@ -1,153 +1,201 @@
-# OpenClawSquad 🦞
+# 🦞 OpenClawSquad
 
-Sistema de orquestração multi-agente para automação de tarefas.
+Framework de orquestração multi-agente de código aberto. Alternativa completa ao opensquad.
 
 ## 🚀 Quick Start
 
 ```bash
-# Clone o repositório
+# Clonar o repositório
 git clone https://github.com/jackchakkal/OpenClawSquad.git
+cd OpenClawSquad
 
-# Abra o Dashboard 2D
-cd dashboard && python3 -m http.server 3000
-# Acesse http://localhost:3000
+# Iniciar
+npm install
+node bin/cli.js init
+
+# Criar um squad
+node bin/cli.js create meu-squad
+
+# Executar
+node bin/cli.js run meu-squad
+
+# Abrir Dashboard
+node bin/cli.js dashboard
 ```
 
-## 📺 Escritório Virtual 2D
+## 📦 O que vem incluído
 
-Interface visual que mostra os agentes trabalhando em tempo real.
+### CLI Completa
+- `init` - Inicializar projeto
+- `create <nome>` - Criar squad dinamicamente
+- `run <nome>` - Executar squad
+- `list` - Listar squads
+- `dashboard` - Abrir escritório virtual 2D
 
-![Dashboard](dashboard/preview.png)
+### Sistema de Pipeline
+- Execução automática de agentes
+- Checkpoints com aprovação humana
+- Estado persistente
+
+### Skills Executáveis
+- `image-creator` - Renderiza HTML → Imagem (via Playwright)
+- `instagram-publisher` - Publica no Instagram (via Graph API)
+- `apify` - Web scraping
+- `image-fetcher` - Busca imagens
+
+### Dashboard 2D
+- Visualização dos agentes em tempo real
+- Status: idle/working/done/error
+- Pipeline visual
+- Checkpoints visuais
+- Console de logs
+- Conexão WebSocket
+
+### Arquitetura de Agentes
+27 agentes com formato rico:
+- Persona (Role, Identity, Communication Style)
+- Principles
+- Operational Framework
+- Voice Guidance
+- Output Examples
+- Anti-Patterns
+- Quality Criteria
+- Integration
+
+## 📁 Estrutura
+
+```
+openclawsquad/
+├── bin/
+│   └── cli.js              # CLI principal
+├── src/
+│   ├── pipeline-runner.js   # Executor de pipeline
+│   ├── squad-creator.js    # Criador dinâmico de squads
+│   └── dashboard-server.js  # Servidor WebSocket
+├── skills/
+│   ├── image-creator/      # Skill de renderização
+│   ├── instagram-publisher/ # Skill de publicação
+│   └── ...
+├── agents/                  # Agentes do sistema
+├── best-practices/          # Guias por plataforma
+├── dashboard/               # Dashboard 2D
+├── squads/                 # Squads criados
+└── package.json
+```
+
+## 🎯 Criar um Squad
+
+```bash
+node bin/cli.js create meu-squad
+```
+
+O Architect vai perguntar:
+1. Propósito do squad
+2. Público-alvo
+3. Modo (Alta Performance / Econômico)
+4. Plataformas (Instagram, LinkedIn, etc)
+
+E criará automaticamente:
+- Arquivos de agentes
+- Pipeline com checkpoints
+- Estrutura de diretórios
+
+## ⚡ Executar um Squad
+
+```bash
+node bin/cli.js run meu-squad
+```
+
+O pipeline executará:
+1. Researcher → checkpoint
+2. Strategist → checkpoint
+3. Creator → checkpoint
+4. Reviewer → checkpoint → done
+
+## 📺 Dashboard
+
+```bash
+node bin/cli.js dashboard
+```
+
+Acesse: http://localhost:3000
 
 **Features:**
 - Visualização 2D dos agentes
 - Status em tempo real
-- Painel de atividade
-- Múltiplos squads
+- Pipeline visual
+- Checkpoints interativos
+- Console de logs
+- Conexão WebSocket com servidor
 
-## 📋 Agentes (27)
+## 🔧 Configuração
 
-### 🎯 Coordenação
-| Agente | Descrição |
-|--------|-----------|
-| **Coordinator** | Coordena múltiplos agentes, gerencia workflows e上下游 |
-
-### 🔍 Inteligência
-| Agente | Descrição |
-|--------|-----------|
-| **Researcher** | Pesquisa informações, tendências e dados do setor |
-| **Scraper** | Extrai dados de websites e APIs |
-
-### 📊 Planejamento
-| Agente | Descrição |
-|--------|-----------|
-| **Strategist** | Gera ideias e define abordagens estratégicas |
-
-### ✍️ Conteúdo
-| Agente | Descrição |
-|--------|-----------|
-| **Writer** | Produz conteúdo written (artigos, posts, documentos) |
-| **Copywriter** | Cria textos persuasivos para marketing e vendas |
-
-### ⚡ Execução
-| Agente | Descrição |
-|--------|-----------|
-| **Executor** | Executa tarefas automatizadas e scripts |
-
-### 🔎 Qualidade
-| Agente | Descrição |
-|--------|-----------|
-| **Reviewer** | Revisa e garante qualidade do conteúdo |
-| **CodeReviewer** | Revisa código e sugere melhorias |
-| **Tester** | Executa testes e valida funcionalidades |
-
-### 🛡️ Segurança
-| Agente | Descrição |
-|--------|-----------|
-| **Pentester** | Testes de penetração e vulnerabilidades |
-| **SecurityAuditor** | Auditorias de segurança completas |
-| **BugHunter** | Caça e reporta bugs |
-
-### 💻 Desenvolvimento
-| Agente | Descrição |
-|--------|-----------|
-| **Architect** | Desenha arquiteturas de software e sistemas |
-| **Debugger** | Identifica e corrige bugs em código |
-
-### 📊 Dados
-| Agente | Descrição |
-|--------|-----------|
-| **DataAnalyst** | Analisa dados e gera insights |
-| **Visualizer** | Cria visualizações e gráficos |
-
-### 📢 Marketing
-| Agente | Descrição |
-|--------|-----------|
-| **SEOExpert** | Otimização para motores de busca |
-| **SocialMediaManager** | Gerencia redes sociais e publicações |
-
-### 💬 Comunicação
-| Agente | Descrição |
-|--------|-----------|
-| **Translator** | Traduz conteúdo entre idiomas |
-| **Summarizer** | Resume textos e documentos |
-| **Tutor** | Ensina conceitos e explica tópicos |
-
-### 📖 Especialistas
-| Agente | Descrição |
-|--------|-----------|
-| **ProductSpecialist** | Especialista em produtos e funcionalidades |
-| **SalesScript** | Cria roteiros de vendas e objeções |
-
-### 🎥 Multimídia
-| Agente | Descrição |
-|--------|-----------|
-| **VideoExtractor** | Extrai conteúdo de vídeos (YouTube, TikTok, etc) |
-| **VideoLearner** | Assiste vídeos e extrai transcrições |
-
----
-
-## Referências
-
-Inspirado no [opensquad](https://github.com/renatoasse/opensquad) - Framework de orquestração multi-agente
-
-### Melhores Práticas do Opensquad Incorporadas
-
-1. **Agentes com responsabilidade única** - Cada agente tem uma função clara
-2. **Pipelines com checkpoints** - Decisões importantes precisam de aprovação humana
-3. **Pesquisa obrigatória** - Agentes de pesquisa usam subagentes
-4. **Revisão obrigatória** - Todo conteúdo passa por revisão antes da entrega
-5. **Formato .agent.md** - Estrutura padronizada com Persona, Princípios, Framework Operacional
-
----
-
-## Uso
+### Variáveis de Ambiente
 
 ```bash
-# Listar agentes
-ls agents/
+# Instagram Publisher
+INSTAGRAM_ACCESS_TOKEN=
+INSTAGRAM_USER_ID=
+IMGBB_API_KEY=
 
-# Executar agente específico
-python3 agent.py <agente> <tarefa>
+# Apify
+APIFY_TOKEN=
 ```
+
+### Criar .env
+
+```bash
+cp .env.example .env
+# Edite com suas chaves
+```
+
+## 🤖 Agentes Disponíveis
+
+| Categoria | Agentes |
+|-----------|---------|
+| Coordenação | Coordinator |
+| Inteligência | Researcher, Scraper |
+| Planejamento | Strategist |
+| Conteúdo | Writer, Copywriter |
+| Design | Designer |
+| Execução | Executor |
+| Qualidade | Reviewer, CodeReviewer, Tester |
+| Segurança | Pentester, SecurityAuditor, BugHunter |
+| Desenvolvimento | Architect, Debugger |
+| Dados | DataAnalyst, Visualizer |
+| Marketing | SEOExpert, SocialMediaManager |
+| Comunicação | Translator, Summarizer, Tutor |
+| Especialistas | ProductSpecialist, SalesScript |
+| Multimídia | VideoExtractor, VideoLearner |
+
+## 📚 Best Practices
+
+Guias por plataforma incluídos:
+- Instagram Feed, Reels, Stories
+- LinkedIn Post, Article
+- Twitter Post, Thread
+- YouTube Script, Shorts
+- Blog Post, SEO
+- Email Newsletter, Sales
+- WhatsApp Broadcast
+
+## 🔄 Diferenças do Opensquad
+
+| Feature | Opensquad | OpenClawSquad |
+|---------|-----------|----------------|
+| CLI | ✅ | ✅ |
+| Pipeline Runner | ✅ | ✅ |
+| Checkpoints | ✅ | ✅ |
+| Skills | ✅ | ✅ |
+| Dashboard 2D | ✅ | ✅ |
+| Integração Claude | ✅ | ⚠️ Requer setup |
+| Open Source | ❌ | ✅ |
+
+## 📄 Licença
+
+MIT - Livre para usar e modificar.
 
 ---
 
-## Arquitetura
-
-```
-agents/
-├── coordinator.agent.md      # Coordenação geral
-├── researcher.agent.md       # Pesquisa
-├── strategist.agent.md       # Estratégia
-├── writer.agent.md          # Redação
-├── copywriter.agent.md      # Copywriting
-├── reviewer.agent.md         # Revisão
-├── pentester.agent.md       # Segurança
-├── ...
-```
-
----
-
-**Criado por:** Jack Chakkal  
+**Desenvolvido por:** Jack Chakkal  
 **GitHub:** https://github.com/jackchakkal/OpenClawSquad
