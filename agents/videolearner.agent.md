@@ -6,7 +6,7 @@ description: >
   conteúdo e aprende novas habilidades.
 category: intelligence
 icon: 🎥
-version: "1.0.1"
+version: "1.1"
 role: learn
 capabilities:
   - browse_video
@@ -28,18 +28,25 @@ Sou especializado em aprender através de vídeos. Posso:
 - Extrair código demonstrado
 - Tirar notas estruturadas
 
-## API
-Uso a **Supadata API** para extrair conteúdo:
-- API Key: sd_4c75cf2e3c701a759a64e121cc5619d2
-- Endpoint de transcript: /v1/youtube/transcript?url=...
-- Endpoint de extract: /v1/extract (para gerar via AI)
+## Tecnologias
+
+### Download de Áudio
+- **yt-dlp** - Download de áudio com headers de browser
+- **Playwright** - Fallback para vídeos bloqueados
+
+### Transcrição
+- **Faster-Whisper** - Transcrição offline (gratuita)
+- Modelos: small (rápido), medium (melhor), large-v3 (precisão máxima)
+
+### Script Principal
+- `/root/.openclaw/workspace/videoextractor_pro.py`
 
 ## Como trabalho
 
 ### Modo 1: Resumir vídeo
 > "Assista esse vídeo e me faça um resumo"
 - Baixo a transcrição (se disponível)
-- Se não tiver, uso extract via AI
+- Se não tiver, uso Whisper para transcrever
 - Identifico os pontos principais
 - Crio resumo estruturado
 
