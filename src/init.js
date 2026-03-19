@@ -22,12 +22,14 @@ const LANGUAGES = [
 ];
 
 const IDES = [
-  { label: 'Claude Code', value: 'claude-code', checked: true },
+  { label: 'Cursor', value: 'cursor', checked: true },
+  { label: 'OpenClaw', value: 'openclaw' },
+  { label: 'Claude Code (CLI)', value: 'claude-code' },
+  { label: 'Gemini CLI', value: 'gemini-cli' },
   { label: 'Codex (OpenAI)', value: 'codex' },
-  { label: 'Cursor', value: 'cursor' },
   { label: 'VS Code + Copilot', value: 'vscode-copilot' },
   { label: 'Windsurf', value: 'windsurf' },
-  { label: ' Zed', value: 'zed' },
+  { label: 'Zed', value: 'zed' },
   { label: 'Jan', value: 'jan' },
 ];
 
@@ -66,7 +68,7 @@ export async function init(targetDir, options = {}) {
       console.log(`\n  ${t('welcome')}\n`);
       console.log('  ✨ Features:');
       console.log('    • WebSocket real-time dashboard');
-      console.log('    • IDE integrations (Claude Code, Codex, Cursor, Windsurf, Zed, Jan)');
+      console.log('    • IDE integrations (Cursor, OpenClaw, Claude Code, Gemini CLI, Codex, Windsurf, Zed, Jan)');
       console.log('    • 27+ pre-built agents');
       console.log('    • Dynamic squad creation');
       console.log('    • Pipeline runner with handoffs\n');
@@ -105,12 +107,15 @@ export async function init(targetDir, options = {}) {
 
 ## Features Enabled
 
-${ides.includes('claude-code') ? '- ✅ Claude Code integration' : '- ❌ Claude Code integration'}
-${ides.includes('codex') ? '- ✅ Codex integration' : '- ❌ Codex integration'}
-${ides.includes('cursor') ? '- ✅ Cursor integration' : '- ❌ Cursor integration'}
-${ides.includes('windsurf') ? '- ✅ Windsurf integration' : '- ❌ Windsurf integration'}
-${ides.includes('zed') ? '- ✅ Zed integration' : '- ❌ Zed integration'}
-${ides.includes('jan') ? '- ✅ Jan local AI integration' : '- ❌ Jan local AI integration'}
+${ides.includes('cursor') ? '- [x] Cursor integration' : '- [ ] Cursor integration'}
+${ides.includes('openclaw') ? '- [x] OpenClaw integration' : '- [ ] OpenClaw integration'}
+${ides.includes('claude-code') ? '- [x] Claude Code (CLI) integration' : '- [ ] Claude Code (CLI) integration'}
+${ides.includes('gemini-cli') ? '- [x] Gemini CLI integration' : '- [ ] Gemini CLI integration'}
+${ides.includes('codex') ? '- [x] Codex integration' : '- [ ] Codex integration'}
+${ides.includes('vscode-copilot') ? '- [x] VS Code + Copilot integration' : '- [ ] VS Code + Copilot integration'}
+${ides.includes('windsurf') ? '- [x] Windsurf integration' : '- [ ] Windsurf integration'}
+${ides.includes('zed') ? '- [x] Zed integration' : '- [ ] Zed integration'}
+${ides.includes('jan') ? '- [x] Jan local AI integration' : '- [ ] Jan local AI integration'}
 `;
   await writeFile(prefsPath, prefsContent, 'utf-8');
 
@@ -120,29 +125,42 @@ ${ides.includes('jan') ? '- ✅ Jan local AI integration' : '- ❌ Jan local AI 
   console.log('  🚀 Next steps:');
   
   for (const ide of ides) {
-    if (ide === 'claude-code') {
-      console.log('\n  📟 Claude Code:');
+    if (ide === 'cursor') {
+      console.log('\n  Cursor:');
+      console.log('    1. Open this folder in Cursor');
+      console.log('    2. The .cursor/rules will be loaded automatically');
+    } else if (ide === 'openclaw') {
+      console.log('\n  OpenClaw:');
+      console.log('    1. Start OpenClaw in this workspace');
+      console.log('    2. The .openclaw/config.json will be loaded automatically');
+    } else if (ide === 'claude-code') {
+      console.log('\n  Claude Code (CLI):');
       console.log('    1. Run: claude');
-      console.log('    2. The agent will automatically load OpenClawSquad');
+      console.log('    2. The agent will automatically load OpenClawSquad skills');
       console.log('    3. Type: "create my-squad" to build a new team');
+    } else if (ide === 'gemini-cli') {
+      console.log('\n  Gemini CLI:');
+      console.log('    1. Run: gemini');
+      console.log('    2. GEMINI.md context will be loaded automatically');
+      console.log('    3. Use OpenClawSquad commands within Gemini');
     } else if (ide === 'codex') {
-      console.log('\n  📟 Codex:');
+      console.log('\n  Codex:');
       console.log('    1. Run: codex');
       console.log('    2. The AGENTS.md will be loaded automatically');
-    } else if (ide === 'cursor') {
-      console.log('\n  📟 Cursor:');
-      console.log('    1. Open this folder in Cursor');
-      console.log('    2. The .cursor/rules will be loaded');
+    } else if (ide === 'vscode-copilot') {
+      console.log('\n  VS Code + Copilot:');
+      console.log('    1. Open this folder in VS Code');
+      console.log('    2. Copilot will load the workspace rules');
     } else if (ide === 'windsurf') {
-      console.log('\n  📟 Windsurf:');
+      console.log('\n  Windsurf:');
       console.log('    1. Open this folder in Windsurf');
       console.log('    2. Rules will be loaded automatically');
     } else if (ide === 'zed') {
-      console.log('\n  📟 Zed:');
+      console.log('\n  Zed:');
       console.log('    1. Open this folder in Zed');
       console.log('    2. OpenClawSquad config will be loaded');
     } else if (ide === 'jan') {
-      console.log('\n  📟 Jan (Local AI):');
+      console.log('\n  Jan (Local AI):');
       console.log('    1. Open Jan app');
       console.log('    2. Connect to this workspace');
     }

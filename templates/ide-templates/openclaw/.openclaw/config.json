@@ -1,0 +1,20 @@
+{
+  "name": "OpenClawSquad",
+  "version": "1.0.0",
+  "description": "Multi-agent orchestration workspace powered by OpenClawSquad",
+  "agents_dir": "agents",
+  "squads_dir": "squads",
+  "skills_dir": "skills",
+  "commands": {
+    "create": "openclawsquad create",
+    "run": "openclawsquad run",
+    "dashboard": "openclawsquad dashboard",
+    "agents": "openclawsquad agents",
+    "skills": "openclawsquad skills"
+  },
+  "context_files": [
+    "_openclawsquad/_memory/preferences.md",
+    "agents/*.agent.md",
+    "squads/*/squad.json"
+  ]
+}

@@ -41,11 +41,12 @@ if (values.version) {
 // Show help
 if (values.help || !command) {
   console.log(`
-  🤖 OpenClawSquad — Multi-agent orchestration framework
+  OpenClawSquad — Multi-agent orchestration framework
 
-  🚀 Better than opensquad with IDE integrations, WebSocket dashboard, and more!
+  Better than opensquad with IDE integrations, WebSocket dashboard, and more!
 
   Usage:
+    npx openclawsquad start                   Interactive setup wizard (Terminal or Dashboard)
     npx openclawsquad init                    Initialize OpenClawSquad in current folder
     npx openclawsquad create <name>           Create a new squad interactively
     npx openclawsquad run <squad>             Run a squad pipeline
@@ -66,7 +67,7 @@ if (values.help || !command) {
 
   Quick Start:
     mkdir my-squad && cd my-squad
-    npx openclawsquad init
+    npx openclawsquad start
     npx openclawsquad create my-team
     npx openclawsquad run my-team
 
@@ -76,7 +77,10 @@ if (values.help || !command) {
 }
 
 // Execute command
-if (command === 'init') {
+if (command === 'start') {
+  const { startSetup } = await import('../src/setup.js');
+  await startSetup(process.cwd());
+} else if (command === 'init') {
   const { init } = await import('../src/init.js');
   await init(process.cwd(), {
     _skipPrompts: values.skipPrompts,
