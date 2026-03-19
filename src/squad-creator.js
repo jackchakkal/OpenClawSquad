@@ -223,54 +223,60 @@ export class SquadCreator {
   }
 
   async _build(design) {
-    // Criar diretórios
-    const squadDir = join(rootDir, 'squads', this.squadName || 'meu-squad');
+    const name = this.squadName || 'meu-squad';
+    const squadDir = join(rootDir, 'squads', name);
     mkdirSync(join(squadDir, 'agents'), { recursive: true });
-    mkdirSync(join(squadDir, 'pipeline', 'steps'), { recursive: true });
-    mkdirSync(join(squadDir, 'data'), { recursive: true });
     mkdirSync(join(squadDir, 'output'), { recursive: true });
 
-    // Criar squad.yaml
-    const squadYaml = this._generateSquadYaml(design);
-    writeFileSync(join(squadDir, 'squad.yaml'), squadYaml);
+    // Generate squad.json (compatible with pipeline-runner)
+    const squadJson = this._generateSquadJson(design);
+    writeFileSync(join(squadDir, 'squad.json'), JSON.stringify(squadJson, null, 2));
 
-    // Criar agentes
+    // Create agent .md files
     for (const agent of design.agents) {
       const agentMd = this._generateAgentMd(agent);
       writeFileSync(join(squadDir, 'agents', `${agent.id}.agent.md`), agentMd);
     }
 
-    // Criar pipeline
-    const pipelineYaml = this._generatePipelineYaml(design);
-    writeFileSync(join(squadDir, 'pipeline', 'pipeline.yaml'), pipelineYaml);
-
     console.log(green(`\n✅ Squad criado com sucesso em: ${squadDir}`));
+    console.log(`   Execute com: npx openclawsquad run ${name}`);
   }
 
-  _generateSquadYaml(design) {
-    return `
-name: ${this.squadName || 'meu-squad'}
-description: ${this.purpose}
-mode: ${design.mode}
-platforms:
-${design.platforms.map(p => `  - ${p}`).join('\n')}
-
-agents:
-${design.agents.map(a => `  - id: ${a.id}
-    name: ${a.name}
-    role: ${a.role}`).join('\n')}
-
-pipeline: ${design.pipeline.length} steps
-`.trim();
+  _generateSquadJson(design) {
+    const name = this.squadName || 'meu-squad';
+    return {
+      name,
+      description: this.purpose,
+      audience: this.audience,
+      mode: design.mode,
+      platforms: design.platforms,
+      agents: design.agents.map(a => a.id),
+      pipeline: design.pipeline.map((step, i) => {
+        if (step.type === 'checkpoint') {
+          return {
+            checkpoint: true,
+            name: step.name,
+            message: step.description
+          };
+        }
+        const prevAgent = design.pipeline.slice(0, i).reverse().find(s => s.agent);
+        return {
+          agent: step.agent,
+          action: step.description,
+          input: prevAgent?.agent || 'user'
+        };
+      })
+    };
   }
 
   _generateAgentMd(agent) {
+    const name = this.squadName || 'meu-squad';
     return `---
-id: squads/meu-squad/agents/${agent.id}
+id: squads/${name}/agents/${agent.id}
 name: ${agent.name}
 title: ${agent.role}
 icon: 🤖
-squad: meu-squad
+squad: ${name}
 execution: subagent
 tasks:
 ${agent.tasks.map(t => `  - ${t}`).join('\n')}
@@ -283,43 +289,31 @@ ${agent.tasks.map(t => `  - ${t}`).join('\n')}
 ### Role
 ${agent.role}
 
+### Objetivo do Squad
+${this.purpose}
+
+### Publico-alvo
+${this.audience}
+
 ## Principles
-1. Executar tarefa com excelência
+1. Executar tarefa com excelencia
 2. Seguir guidelines do squad
-3. Reportar progresso
-4. Solicitar ajuda quando necessário
+3. Reportar progresso de forma clara
+4. Solicitar ajuda quando necessario
+5. Manter consistencia com o publico-alvo
 
 ## Tasks
 ${agent.tasks.join(', ')}
+
+## Output Format
+- Estruturado em markdown
+- Claro e acionavel
+- Pronto para o proximo agente consumir
 
 ## Integration
 - Depends on: previous step
 - Output: output/${agent.id}.md
 `;
-  }
-
-  _generatePipelineYaml(design) {
-    let yaml = 'steps:\n';
-    
-    design.pipeline.forEach((step, i) => {
-      if (step.type === 'checkpoint') {
-        yaml += `
-- type: checkpoint
-  name: ${step.name}
-  description: ${step.description}
-`;
-      } else {
-        yaml += `
-- type: agent
-  agent: ${step.agent}
-  description: ${step.description}
-  inputFile: output/${design.pipeline[i-1]?.agent || 'start'}.md
-  outputFile: output/${step.agent}.md
-`;
-      }
-    });
-
-    return yaml.trim();
   }
 }
 
