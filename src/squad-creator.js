@@ -329,3 +329,21 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   creator.squadName = process.argv[2] || 'meu-squad';
   creator.create();
 }
+
+export async function createSquad(squadName, targetDir, options = {}) {
+  const creator = new SquadCreator();
+  creator.squadName = squadName || 'meu-squad';
+  
+  if (options._skipPrompts) {
+    // Quick mode - create a basic squad
+    creator.purpose = 'General purpose squad';
+    creator.audience = 'General';
+    creator.mode = 'high';
+    creator.platforms = ['Instagram', 'LinkedIn'];
+    
+    const design = await creator._design();
+    await creator._build(design);
+  } else {
+    await creator.create();
+  }
+}
