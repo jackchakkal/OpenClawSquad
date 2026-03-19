@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Dashboard Server - Servidor WebSocket para Dashboard 2D em tempo real
- * Integrado com PipelineRunner para status real dos agentes
+ * Dashboard Server - WebSocket server for real-time 2D dashboard
+ * Integrated with PipelineRunner for real agent status
  */
 
 import { WebSocketServer, WebSocket } from 'ws';
@@ -22,7 +22,7 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg'
 };
 
-// Estado do sistema
+// System state
 const state = {
   squads: new Map(),
   agents: new Map(),
@@ -32,9 +32,9 @@ const state = {
 };
 
 function createDashboardServer(port = 3001) {
-  // Servidor HTTP simples
+  // Simple HTTP server
   const server = http.createServer((req, res) => {
-    // Headers CORS
+    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -95,10 +95,10 @@ function createDashboardServer(port = 3001) {
   const wss = new WebSocketServer({ server });
 
   wss.on('connection', (ws) => {
-    console.log('📱 Cliente conectado ao dashboard');
+    console.log('📱 Client connected to dashboard');
     state.connections.add(ws);
 
-    // Enviar estado inicial
+    // Send initial state
     ws.send(JSON.stringify({
       type: 'init',
       data: {
@@ -114,7 +114,7 @@ function createDashboardServer(port = 3001) {
         const msg = JSON.parse(message);
         handleMessage(ws, msg);
       } catch (e) {
-        console.error('❌ Erro ao processar mensagem:', e);
+        console.error('❌ Error processing message:', e);
       }
     });
 
@@ -159,7 +159,7 @@ function startSquad(squadName, agents) {
     agents: agentsList
   });
 
-  addActivity('System', `Squad "${squadName}" iniciado`);
+  addActivity('System', `Squad "${squadName}" started`);
 
   broadcast({
     type: 'squad_started',
@@ -253,8 +253,8 @@ export async function startDashboard(targetDir, port = 3001) {
 ║          /api/providers                   ║
 ╚═══════════════════════════════════════════╝
     `);
-    console.log('  Aguardando execucao de squads...');
-    console.log('  Use "openclawsquad run <squad>" em outro terminal\n');
+    console.log('  Waiting for squad execution...');
+    console.log('  Use "openclawsquad run <squad>" in another terminal\n');
   });
 }
 

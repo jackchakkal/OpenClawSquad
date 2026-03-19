@@ -1,6 +1,6 @@
 {
   "name": "content",
-  "description": "Squad de criação de conteúdo",
+  "description": "Content creation squad",
   "agents": ["coordinator", "researcher", "writer", "reviewer"],
   "pipeline": [
     {"agent": "coordinator", "action": "brief", "checkpoint": true},

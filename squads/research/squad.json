@@ -1,6 +1,6 @@
 {
   "name": "research",
-  "description": "Squad de pesquisa profunda",
+  "description": "Deep research squad",
   "agents": ["coordinator", "researcher", "strategist"],
   "pipeline": [
     {"agent": "coordinator", "action": "define", "checkpoint": true},

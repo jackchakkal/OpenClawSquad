@@ -1,6 +1,6 @@
 {
   "name": "automation",
-  "description": "Squad de automação de tarefas",
+  "description": "Task automation squad",
   "agents": ["coordinator", "strategist", "executor", "reviewer"],
   "pipeline": [
     {"agent": "coordinator", "action": "understand", "checkpoint": true},
