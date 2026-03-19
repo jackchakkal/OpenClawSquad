@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "Multi-agent orchestration framework - open source alternative to opensquad with IDE integrations, WebSocket dashboard, and more",
   "type": "module",
-  "main": "src/index.js",
+  "main": "bin/openclawsquad.js",
   "bin": {
     "openclawsquad": "./bin/openclawsquad.js"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "skills/"
+  ],
   "scripts": {
     "start": "node src/index.js",
     "init": "node bin/openclawsquad.js init",
