@@ -22,7 +22,8 @@
     "create": "node bin/openclawsquad.js create",
     "run": "node bin/openclawsquad.js run",
     "dashboard": "node bin/openclawsquad.js dashboard",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "prepublishOnly": "node bin/openclawsquad.js --version"
   },
   "keywords": [
     "ai",
