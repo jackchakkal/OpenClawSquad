@@ -11,30 +11,12 @@ import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Dynamic imports to avoid loading everything at startup
-async function loadCommand(command) {
-  switch (command) {
-    case 'init':
-      return import('../src/init.js');
-    case 'update':
-      return import('../src/update.js');
-    case 'skills':
-    case 'install':
-    case 'uninstall':
-      return import('../src/skills-cli.js');
-    case 'agents':
-      return import('../src/agents-cli.js');
-    case 'runs':
-      return import('../src/runs.js');
-    case 'create':
-      return import('../src/squad-creator.js');
-    case 'run':
-      return import('../src/pipeline-runner.js');
-    case 'dashboard':
-      return import('../src/dashboard-server.js');
-    default:
-      return null;
-  }
+// Load .env early
+try {
+  const dotenv = await import('dotenv');
+  dotenv.config();
+} catch {
+  // dotenv not installed or no .env file
 }
 
 const { positionals, values } = parseArgs({
@@ -78,6 +60,7 @@ if (values.help || !command) {
     npx openclawsquad agents update           Update all agents
     npx openclawsquad runs [squad-name]        View execution history
     npx openclawsquad dashboard                Start the real-time dashboard
+    npx openclawsquad config                   Show current configuration
     npx openclawsquad --version                Show version
     npx openclawsquad --help                   Show this help
 
@@ -147,6 +130,24 @@ if (command === 'init') {
 } else if (command === 'dashboard') {
   const { startDashboard } = await import('../src/dashboard-server.js');
   await startDashboard(process.cwd());
+} else if (command === 'config') {
+  const { loadConfig } = await import('../src/config.js');
+  const { listProviders } = await import('../src/providers/index.js');
+  const config = loadConfig(process.cwd());
+  const providers = listProviders();
+
+  console.log('\n  🔧 OpenClawSquad Configuration\n');
+  console.log(`  Provider:     ${config.provider || 'auto-detect'}`);
+  console.log(`  Model:        ${config.model || '(provider default)'}`);
+  console.log(`  Temperature:  ${config.temperature}`);
+  console.log(`  Max Tokens:   ${config.maxTokens}`);
+  console.log(`  Language:     ${config.language}`);
+  console.log('\n  📡 LLM Providers:\n');
+  for (const p of providers) {
+    const status = p.configured ? '✅ configured' : '❌ not set';
+    console.log(`  ${p.configured ? '>' : ' '} ${p.label.padEnd(20)} ${status} (${p.envVar})`);
+  }
+  console.log('');
 } else {
   console.log(`Unknown command: ${command}`);
   console.log('Run --help for usage information');

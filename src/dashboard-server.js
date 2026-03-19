@@ -2,6 +2,7 @@
 
 /**
  * Dashboard Server - Servidor WebSocket para Dashboard 2D em tempo real
+ * Integrado com PipelineRunner para status real dos agentes
  */
 
 import { WebSocketServer, WebSocket } from 'ws';
@@ -11,7 +12,6 @@ import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const PORT = 3001;
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -27,62 +27,104 @@ const state = {
   squads: new Map(),
   agents: new Map(),
   activities: [],
-  connections: new Set()
+  connections: new Set(),
+  activeRuns: new Map()
 };
 
-// Servidor HTTP simples
-const server = http.createServer((req, res) => {
-  let filePath = join(__dirname, '..', 'dashboard');
-  
-  if (req.url === '/') {
-    filePath = join(filePath, 'index.html');
-  } else {
-    filePath = join(filePath, req.url);
-  }
+function createDashboardServer(port = 3001) {
+  // Servidor HTTP simples
+  const server = http.createServer((req, res) => {
+    // Headers CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (!existsSync(filePath)) {
-    res.writeHead(404);
-    res.end('Not found');
-    return;
-  }
-
-  const ext = extname(filePath);
-  const contentType = MIME_TYPES[ext] || 'text/plain';
-  
-  res.writeHead(200, { 'Content-Type': contentType });
-  res.end(readFileSync(filePath));
-});
-
-// WebSocket server
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', (ws) => {
-  console.log('📱 Cliente conectado ao dashboard');
-  state.connections.add(ws);
-
-  // Enviar estado inicial
-  ws.send(JSON.stringify({
-    type: 'init',
-    data: {
-      squads: Array.from(state.squads.values()),
-      agents: Array.from(state.agents.values()),
-      activities: state.activities.slice(-20)
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
     }
-  }));
 
-  ws.on('message', (message) => {
-    try {
-      const msg = JSON.parse(message);
-      handleMessage(ws, msg);
-    } catch (e) {
-      console.error('❌ Erro ao processar mensagem:', e);
+    // API endpoints
+    if (req.url === '/api/status') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        squads: Array.from(state.squads.values()),
+        agents: Array.from(state.agents.values()),
+        activeRuns: Array.from(state.activeRuns.values()),
+        activities: state.activities.slice(-20)
+      }));
+      return;
     }
+
+    if (req.url === '/api/providers') {
+      // Dynamically import to avoid issues
+      import('./providers/index.js').then(({ listProviders }) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(listProviders()));
+      }).catch(() => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end('[]');
+      });
+      return;
+    }
+
+    // Static files
+    let filePath = join(__dirname, '..', 'dashboard');
+
+    if (req.url === '/') {
+      filePath = join(filePath, 'index.html');
+    } else {
+      filePath = join(filePath, req.url);
+    }
+
+    if (!existsSync(filePath)) {
+      res.writeHead(404);
+      res.end('Not found');
+      return;
+    }
+
+    const ext = extname(filePath);
+    const contentType = MIME_TYPES[ext] || 'text/plain';
+
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(readFileSync(filePath));
   });
 
-  ws.on('close', () => {
-    state.connections.delete(ws);
+  // WebSocket server
+  const wss = new WebSocketServer({ server });
+
+  wss.on('connection', (ws) => {
+    console.log('📱 Cliente conectado ao dashboard');
+    state.connections.add(ws);
+
+    // Enviar estado inicial
+    ws.send(JSON.stringify({
+      type: 'init',
+      data: {
+        squads: Array.from(state.squads.values()),
+        agents: Array.from(state.agents.values()),
+        activeRuns: Array.from(state.activeRuns.values()),
+        activities: state.activities.slice(-20)
+      }
+    }));
+
+    ws.on('message', (message) => {
+      try {
+        const msg = JSON.parse(message);
+        handleMessage(ws, msg);
+      } catch (e) {
+        console.error('❌ Erro ao processar mensagem:', e);
+      }
+    });
+
+    ws.on('close', () => {
+      state.connections.delete(ws);
+    });
   });
-});
+
+  return { server, wss };
+}
 
 function handleMessage(ws, msg) {
   switch (msg.type) {
@@ -105,21 +147,23 @@ function handleMessage(ws, msg) {
 }
 
 function startSquad(squadName, agents) {
+  const agentsList = (agents || []).map((a, i) => ({
+    ...(typeof a === 'string' ? { id: a, name: a } : a),
+    position: { x: 100 + (i * 120), y: 150 }
+  }));
+
   state.squads.set(squadName, {
     name: squadName,
     status: 'running',
     startTime: Date.now(),
-    agents: agents.map((a, i) => ({
-      ...a,
-      position: { x: 100 + (i * 120), y: 150 }
-    }))
+    agents: agentsList
   });
 
   addActivity('System', `Squad "${squadName}" iniciado`);
 
   broadcast({
     type: 'squad_started',
-    data: { squadName, agents }
+    data: { squadName, agents: agentsList }
   });
 }
 
@@ -130,6 +174,8 @@ function updateAgentStatus(agentId, status, task) {
     task: task || '',
     lastUpdate: Date.now()
   });
+
+  addActivity(agentId, `${status}: ${task || ''}`);
 
   broadcast({
     type: 'agent_updated',
@@ -143,9 +189,9 @@ function addActivity(agent, message) {
     agent,
     message
   };
-  
+
   state.activities.push(activity);
-  
+
   if (state.activities.length > 100) {
     state.activities.shift();
   }
@@ -158,7 +204,7 @@ function addActivity(agent, message) {
 
 function broadcast(message) {
   const data = JSON.stringify(message);
-  
+
   state.connections.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(data);
@@ -166,47 +212,50 @@ function broadcast(message) {
   });
 }
 
-// API REST simples para controlar execução
-server.on('request', (req, res) => {
-  // Headers CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
-});
+/**
+ * Create a status callback for PipelineRunner integration
+ */
+export function createPipelineStatusCallback() {
+  return (event) => {
+    updateAgentStatus(event.agentId, event.status, event.task);
 
-server.listen(PORT, () => {
-  console.log(`
+    if (event.type === 'pipeline_start') {
+      startSquad(event.squad, []);
+    }
+  };
+}
+
+/**
+ * Export state management functions for external use
+ */
+export { updateAgentStatus, startSquad, addActivity, broadcast, state };
+
+export async function startDashboard(targetDir, port = 3001) {
+  // Load .env if available
+  try {
+    const dotenv = await import('dotenv');
+    dotenv.config();
+  } catch {
+    // dotenv not installed
+  }
+
+  const { server } = createDashboardServer(port);
+
+  server.listen(port, () => {
+    console.log(`
 ╔═══════════════════════════════════════════╗
 ║   🦞 OpenClawSquad Dashboard Server      ║
 ╠═══════════════════════════════════════════╣
-║   HTTP:  http://localhost:${PORT}           ║
-║   WS:    ws://localhost:${PORT}             ║
+║   HTTP:  http://localhost:${port}           ║
+║   WS:    ws://localhost:${port}             ║
+║                                           ║
+║   API:   /api/status                      ║
+║          /api/providers                   ║
 ╚═══════════════════════════════════════════╝
-  `);
-  
-  // Exemplos de agentes para demo
-  const demoAgents = [
-    { id: 'coordinator', name: 'Coordinator', icon: '🎯', status: 'idle' },
-    { id: 'researcher', name: 'Rodrigo Referencia', icon: '🔍', status: 'idle' },
-    { id: 'strategist', name: 'Sofia Estratégia', icon: '🧠', status: 'idle' },
-    { id: 'writer', name: 'Wanda Writer', icon: '✍️', status: 'idle' },
-    { id: 'designer', name: 'Diego Design', icon: '🎨', status: 'idle' },
-    { id: 'reviewer', name: 'Renata Revisão', icon: '✅', status: 'idle' }
-  ];
-  
-  startSquad('content-squad', demoAgents);
-});
-
-export default server;
-
-export async function startDashboard(targetDir, port = 3001) {
-  console.log('\n  📊 Starting OpenClawSquad Dashboard...\n');
-  console.log(`  Server running at http://localhost:${port}`);
-  console.log('  Press Ctrl+C to stop\n');
+    `);
+    console.log('  Aguardando execucao de squads...');
+    console.log('  Use "openclawsquad run <squad>" em outro terminal\n');
+  });
 }
+
+export default createDashboardServer;
