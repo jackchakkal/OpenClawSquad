@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenClawSquad - Escritório Virtual 2D</title>
+    <title>OpenClawSquad - Virtual Office Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -479,11 +479,11 @@
             <div class="pipeline-flow" id="pipeline">
                 <div class="pipeline-step" data-step="1">🔍 Pesquisa</div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="2">🧠 Estratégia</div>
+                <div class="pipeline-step" data-step="2">🧠 Strategy</div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="3">✍️ Criação</div>
+                <div class="pipeline-step" data-step="3">✍️ Creation</div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="4">✅ Revisão</div>
+                <div class="pipeline-step" data-step="4">✅ Review</div>
             </div>
 
             <div class="controls">
@@ -512,7 +512,7 @@
     <div class="checkpoint-modal" id="checkpointModal">
         <div class="checkpoint-content">
             <h2>⏸️ Checkpoint</h2>
-            <p id="checkpointMessage">Aprovação necessária para continuar</p>
+            <p id="checkpointMessage">Approval required to continue</p>
             <button class="checkpoint-btn approve" onclick="approveCheckpoint()">✅ Aprovar</button>
             <button class="checkpoint-btn reject" onclick="rejectCheckpoint()">❌ Rejeitar</button>
         </div>
@@ -536,7 +536,7 @@
             ws.onclose = () => {
                 document.getElementById('wsStatus').classList.remove('connected');
                 document.getElementById('wsText').textContent = 'Desconectado';
-                addLog('error', 'Conexão perdida - reconectando...');
+                addLog('error', 'Connection lost - reconnecting...');
                 setTimeout(connect, 3000);
             };
             
@@ -615,7 +615,7 @@
             // Update sidebar
             const statusEl = document.getElementById(`status-${agentId}`);
             if (statusEl) {
-                const texts = { idle: 'Aguardando', working: 'Trabalhando', done: 'Concluído', error: 'Erro' };
+                const texts = { idle: 'Idle', working: 'Working', done: 'Completed', error: 'Error' };
                 statusEl.textContent = texts[status] || status;
             }
             
@@ -691,7 +691,7 @@
         }
 
         function runDemo() {
-            addLog('system', 'Iniciando execução do squad...');
+            addLog('system', 'Starting squad execution...');
             
             // Simular pipeline
             const steps = ['researcher', 'strategist', 'writer', 'reviewer'];
@@ -702,13 +702,13 @@
                     addLog('agent', `${agentId}: Executando tarefa...`);
                     
                     setTimeout(() => {
-                        updateAgentStatus(agentId, 'done', 'Concluído');
-                        addLog('agent', `${agentId}: Tarefa concluída!`);
+                        updateAgentStatus(agentId, 'done', 'Completed');
+                        addLog('agent', `${agentId}: Task completed!`);
                         
                         if (i === 0 || i === 2) {
                             //Checkpoint after researcher and writer
                             setTimeout(() => {
-                                showCheckpoint({ message: 'Conteúdo criado. Aprovar para continuar?' });
+                                showCheckpoint({ message: 'Content created. Approve to continue?' });
                             }, 500);
                         }
                     }, 1500);

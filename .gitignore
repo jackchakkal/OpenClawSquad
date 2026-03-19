@@ -1,5 +1,51 @@
+# Dependencies
 node_modules/
+
+# Environment variables (NEVER commit .env files with real keys)
 .env
-.DS_Store
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# OpenClawSquad runtime data
 _openclawsquad/runs/
 _openclawsquad/logs/
+
+# Credentials & secrets
+*.key
+*.pem
+*.p12
+*.pfx
+*.cert
+.credentials/
+.tokens/
+.ssh/
+
+# Logs (pentest reports, execution logs, etc.)
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# Build artifacts
+dist/
+build/
+coverage/
+*.tgz
+
+# Temporary files
+tmp/
+temp/
+*.tmp
