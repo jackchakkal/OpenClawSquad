@@ -1,0 +1,13 @@
+# OpenClawSquad Core
+
+This is the OpenClawSquad core configuration.
+
+## Version
+{{version}}
+
+## Features
+
+- Multi-agent orchestration
+- Real-time dashboard
+- IDE integrations
+- 27+ pre-built agents

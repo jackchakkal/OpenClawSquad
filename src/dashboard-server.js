@@ -204,3 +204,9 @@ server.listen(PORT, () => {
 });
 
 export default server;
+
+export async function startDashboard(targetDir, port = 3001) {
+  console.log('\n  📊 Starting OpenClawSquad Dashboard...\n');
+  console.log(`  Server running at http://localhost:${port}`);
+  console.log('  Press Ctrl+C to stop\n');
+}

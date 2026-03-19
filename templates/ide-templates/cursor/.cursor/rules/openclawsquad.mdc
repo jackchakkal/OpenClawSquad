@@ -1,0 +1,29 @@
+# OpenClawSquad Rules for Cursor
+
+You are working with OpenClawSquad, a multi-agent orchestration framework.
+
+## Available Commands
+
+- `squad create <name>` - Create a new squad
+- `squad run <name>` - Execute a squad pipeline
+- `squad list` - List all squads
+
+## Agents
+
+OpenClawSquad includes 27+ agents:
+- coordinator, researcher, scraper, strategist
+- writer, copywriter, designer
+- executor, reviewer, codereviewer, tester
+- pentester, securityauditor, bughunter, debugger
+- dataanalyst, visualizer
+- seoexpert, socialmediamanager
+- translator, summarizer, tutor
+- productspecialist, salesscript, videoextractor, videolearner
+
+## Usage
+
+1. Create a squad: `npx openclawsquad create marketing-team`
+2. Define agents in squads/marketing-team.yaml
+3. Run: `npx openclawsquad run marketing-team`
+
+For more info: https://github.com/jackchakkal/OpenClawSquad

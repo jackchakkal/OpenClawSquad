@@ -153,3 +153,19 @@ export class PipelineRunner {
 }
 
 export default PipelineRunner;
+
+export async function runPipeline(squadName, targetDir) {
+  if (!squadName) {
+    console.log('  Usage: openclawsquad run <squad-name>\n');
+    return;
+  }
+
+  const runner = new PipelineRunner(squadName);
+  
+  try {
+    await runner.load();
+    await runner.execute();
+  } catch (e) {
+    console.log(`  ❌ Error: ${e.message}\n`);
+  }
+}

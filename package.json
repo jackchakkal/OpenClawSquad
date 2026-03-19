@@ -1,26 +1,55 @@
 {
   "name": "openclawsquad",
   "version": "1.0.0",
-  "description": "Multi-agent orchestration framework - open source alternative to opensquad",
+  "description": "Multi-agent orchestration framework - open source alternative to opensquad with IDE integrations, WebSocket dashboard, and more",
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "openclawsquad": "./bin/cli.js"
+    "openclawsquad": "./bin/openclawsquad.js"
   },
   "scripts": {
     "start": "node src/index.js",
-    "init": "node src/init.js",
-    "create": "node src/create-squad.js",
-    "run": "node src/run-squad.js",
-    "dashboard": "node src/dashboard-server.js"
+    "init": "node bin/openclawsquad.js init",
+    "create": "node bin/openclawsquad.js create",
+    "run": "node bin/openclawsquad.js run",
+    "dashboard": "node bin/openclawsquad.js dashboard",
+    "test": "node --test tests/*.test.js"
   },
-  "keywords": ["ai", "agents", "orchestration", "multi-agent", "squad"],
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestration",
+    "multi-agent",
+    "squad",
+    "claude-code",
+    "codex",
+    "cursor",
+    "windsurf",
+    "openai"
+  ],
   "author": "Jack Chakkal",
   "license": "MIT",
+  "homepage": "https://github.com/jackchakkal/OpenClawSquad",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackchakkal/OpenClawSquad.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jackchakkal/OpenClawSquad/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "inquirer": "^9.2.12",
     "yaml": "^2.3.4",
-    "ora": "^5.4.1"
-  }
+    "ora": "^5.4.1",
+    "ws": "^8.16.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "preferGlobal": true
 }
