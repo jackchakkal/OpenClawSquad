@@ -19,6 +19,10 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="./GETTING_STARTED.md">📖 Guia de Início (PT-BR) — Getting Started Guide</a>
+</p>
+
 ---
 
 ## ✨ Features
