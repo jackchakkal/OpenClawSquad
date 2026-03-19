@@ -9,24 +9,24 @@ import createOpenAIProvider from './openai.js';
 import createAnthropicProvider from './anthropic.js';
 
 const PROVIDERS = {
-  minimax: {
-    envVar: 'MINIMAX_API_KEY',
-    create: (key) => createMinimaxProvider(key),
-    label: 'Minimax M2.7'
+  anthropic: {
+    envVar: 'ANTHROPIC_API_KEY',
+    create: (key) => createAnthropicProvider(key),
+    label: 'Anthropic Claude'
   },
   openai: {
     envVar: 'OPENAI_API_KEY',
     create: (key) => createOpenAIProvider(key),
     label: 'OpenAI'
   },
-  anthropic: {
-    envVar: 'ANTHROPIC_API_KEY',
-    create: (key) => createAnthropicProvider(key),
-    label: 'Anthropic Claude'
+  minimax: {
+    envVar: 'MINIMAX_API_KEY',
+    create: (key) => createMinimaxProvider(key),
+    label: 'Minimax M2.7'
   }
 };
 
-const PRIORITY = ['minimax', 'openai', 'anthropic'];
+const PRIORITY = ['anthropic', 'openai', 'minimax'];
 
 /**
  * Get a specific provider by name

@@ -61,18 +61,18 @@ export class AgentExecutor {
     }, this.targetDir);
 
     // Build the user message with task and previous context
-    let userMessage = `## Tarefa\n${task}`;
+    let userMessage = `## Task\n${task}`;
 
     if (context.previousOutput) {
-      userMessage += `\n\n## Contexto do Step Anterior\n${context.previousOutput}`;
+      userMessage += `\n\n## Previous Step Context\n${context.previousOutput}`;
     }
 
     if (context.userInput) {
-      userMessage += `\n\n## Input do Usuario\n${context.userInput}`;
+      userMessage += `\n\n## User Input\n${context.userInput}`;
     }
 
     if (context.squadInfo) {
-      userMessage += `\n\n## Informacoes do Squad\n${context.squadInfo}`;
+      userMessage += `\n\n## Squad Info\n${context.squadInfo}`;
     }
 
     const messages = [
@@ -126,8 +126,8 @@ export class AgentExecutor {
   _formatOutput(agentName, task, content, usage) {
     const timestamp = new Date().toISOString();
     let output = `# Output: ${agentName}\n`;
-    output += `> Gerado em: ${timestamp}\n`;
-    output += `> Tarefa: ${task}\n`;
+    output += `> Generated at: ${timestamp}\n`;
+    output += `> Task: ${task}\n`;
     if (usage) {
       output += `> Tokens: ${usage.prompt_tokens || 0} input, ${usage.completion_tokens || 0} output\n`;
     }

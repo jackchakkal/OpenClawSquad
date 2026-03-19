@@ -10,6 +10,9 @@
   "files": [
     "bin/",
     "src/",
+    "agents/",
+    "squads/",
+    "dashboard/",
     "templates/",
     "skills/"
   ],
@@ -58,5 +61,7 @@
   "devDependencies": {
     "eslint": "^8.57.0"
   },
-  "preferGlobal": true
+  "publishConfig": {
+    "access": "public"
+  }
 }

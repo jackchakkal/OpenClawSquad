@@ -2,7 +2,7 @@
  * OpenClawSquad - Runs History
  */
 
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readdir, readFile, stat, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export async function listRuns(squadName = null, targetDir) {

@@ -1,6 +1,6 @@
 /**
  * OpenClawSquad Pipeline Runner
- * Executa squads de forma automatica com checkpoints e chamadas reais ao LLM
+ * Executes squads with checkpoints and real LLM calls
  */
 
 import chalk from 'chalk';
@@ -52,11 +52,11 @@ export class PipelineRunner {
       this.pipeline = data;
       this.steps = data.steps || data.pipeline || [];
     } else {
-      throw new Error(`Squad "${this.squadName}" nao encontrado em ${this.squadDir}`);
+      throw new Error(`Squad "${this.squadName}" not found in ${this.squadDir}`);
     }
 
-    console.log(cyan(`\n📋 Pipeline carregado: ${this.pipeline.name || this.squadName}`));
-    console.log(dim(`   ${this.steps.length} steps definidos`));
+    console.log(cyan(`\n📋 Pipeline loaded: ${this.pipeline.name || this.squadName}`));
+    console.log(dim(`   ${this.steps.length} steps defined`));
 
     // Load agents
     await this._loadAgents();
@@ -100,12 +100,12 @@ export class PipelineRunner {
     }
 
     const count = Object.keys(this.agents).length;
-    console.log(green(`✅ ${count} agente(s) carregado(s)`));
+    console.log(green(`✅ ${count} agent(s) loaded`));
 
     // Warn about missing agents
     for (const agentId of agentIds) {
       if (!this.agents[agentId]) {
-        console.log(yellow(`   ⚠️  Agente "${agentId}" nao encontrado`));
+        console.log(yellow(`   ⚠️  Agent "${agentId}" not found`));
       }
     }
   }
@@ -118,7 +118,7 @@ export class PipelineRunner {
     this.status = 'running';
     this.context.userInput = userInput || '';
 
-    console.log(cyan('\n🎬 Iniciando execucao do pipeline...\n'));
+    console.log(cyan('\n🎬 Starting pipeline execution...\n'));
 
     await logEvent('pipeline_start', {
       squad: this.squadName,
@@ -133,21 +133,21 @@ export class PipelineRunner {
 
       if (step.type === 'checkpoint' || step.checkpoint) {
         // Checkpoint - pause for human approval
-        const name = step.name || step.action || 'Aprovacao necessaria';
+        const name = step.name || step.action || 'Approval required';
         console.log(yellow(`\n⏸️  CHECKPOINT [${i + 1}/${totalSteps}]: ${name}`));
 
         if (this.context.lastOutput) {
-          console.log(dim('\n--- Ultimo output ---'));
+          console.log(dim('\n--- Last output ---'));
           console.log(dim(this.context.lastOutput.substring(0, 500)));
           if (this.context.lastOutput.length > 500) {
-            console.log(dim('... (truncado)'));
+            console.log(dim('... (truncated)'));
           }
-          console.log(dim('--- fim ---\n'));
+          console.log(dim('--- end ---\n'));
         }
 
         const { approved, feedback } = await this._askApproval(step);
         if (!approved) {
-          console.log(red('❌ Execucao cancelada pelo usuario'));
+          console.log(red('❌ Execution cancelled by user'));
           this.status = 'cancelled';
           await logEvent('pipeline_cancelled', { squad: this.squadName, step: i }, this.targetDir);
           return this._buildResult();
@@ -162,7 +162,7 @@ export class PipelineRunner {
     }
 
     this.status = 'completed';
-    console.log(green('\n✅ Pipeline executado com sucesso!'));
+    console.log(green('\n✅ Pipeline executed successfully!'));
     console.log(dim(`   Run ID: ${this.runId}`));
 
     await logEvent('pipeline_complete', {
@@ -180,12 +180,12 @@ export class PipelineRunner {
   async _executeStep(step, stepIndex, totalSteps) {
     const agentId = step.agent;
     const agentFilePath = this.agents[agentId];
-    const action = step.action || step.description || 'Executando';
+    const action = step.action || step.description || 'Executing';
 
     console.log(yellow(`\n[${stepIndex + 1}/${totalSteps}] 🤖 ${agentId}: ${action}`));
 
     if (!agentFilePath) {
-      console.log(red(`   ❌ Agente "${agentId}" nao encontrado - pulando step`));
+      console.log(red(`   ❌ Agent "${agentId}" not found - skipping step`));
       this.results.push({ agentId, status: 'skipped', error: 'Agent not found' });
       return;
     }
@@ -227,17 +227,17 @@ export class PipelineRunner {
       const tokens = result.usage
         ? `${result.usage.prompt_tokens || 0}+${result.usage.completion_tokens || 0} tokens`
         : '';
-      console.log(green(`   ✓ Concluido ${dim(tokens)}`));
+      console.log(green(`   ✓ Completed ${dim(tokens)}`));
 
       this._emitStatus(agentId, 'completed', action);
     } catch (error) {
-      console.log(red(`   ❌ Erro: ${error.message}`));
+      console.log(red(`   ❌ Error: ${error.message}`));
       this.results.push({ agentId, status: 'error', error: error.message });
       this._emitStatus(agentId, 'error', error.message);
 
       // Ask user if they want to continue despite the error
       const { approved } = await this._askApproval({
-        message: `Agente "${agentId}" falhou. Continuar mesmo assim?`
+        message: `Agent "${agentId}" failed. Continue anyway?`
       });
       if (!approved) {
         this.status = 'failed';
@@ -249,13 +249,13 @@ export class PipelineRunner {
   _buildTaskDescription(step) {
     const parts = [];
 
-    if (step.action) parts.push(`Acao: ${step.action}`);
-    if (step.description) parts.push(`Descricao: ${step.description}`);
-    if (step.input) parts.push(`Input esperado de: ${step.input}`);
-    if (step.inputFile) parts.push(`Arquivo de input: ${step.inputFile}`);
-    if (step.outputFile) parts.push(`Salvar output em: ${step.outputFile}`);
+    if (step.action) parts.push(`Action: ${step.action}`);
+    if (step.description) parts.push(`Description: ${step.description}`);
+    if (step.input) parts.push(`Expected input from: ${step.input}`);
+    if (step.inputFile) parts.push(`Input file: ${step.inputFile}`);
+    if (step.outputFile) parts.push(`Save output to: ${step.outputFile}`);
 
-    return parts.join('\n') || 'Execute sua tarefa principal conforme sua persona.';
+    return parts.join('\n') || 'Execute your main task according to your persona.';
   }
 
   async _askApproval(step) {
@@ -265,7 +265,7 @@ export class PipelineRunner {
       {
         type: 'confirm',
         name: 'approved',
-        message: step.message || 'Aprovar e continuar?',
+        message: step.message || 'Approve and continue?',
         default: true
       }
     ]);
@@ -276,7 +276,7 @@ export class PipelineRunner {
         {
           type: 'input',
           name: 'feedback',
-          message: 'Feedback ou instrucoes adicionais (Enter para pular):',
+          message: 'Feedback or additional instructions (Enter to skip):',
           default: ''
         }
       ]);
@@ -394,7 +394,7 @@ export async function runPipeline(squadName, targetDir) {
       {
         type: 'input',
         name: 'userInput',
-        message: '📝 Descreva o objetivo desta execucao:',
+        message: '📝 Describe the objective for this execution:',
         default: ''
       }
     ]);
@@ -403,7 +403,7 @@ export async function runPipeline(squadName, targetDir) {
 
     if (result.status === 'completed') {
       const tokens = result.totalTokens;
-      console.log(dim(`\n📊 Total: ${tokens.prompt_tokens + tokens.completion_tokens} tokens usados`));
+      console.log(dim(`\n📊 Total: ${tokens.prompt_tokens + tokens.completion_tokens} tokens used`));
     }
   } catch (e) {
     console.log(`  ❌ Error: ${e.message}\n`);

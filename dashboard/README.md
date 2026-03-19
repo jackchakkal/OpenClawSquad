@@ -1,61 +1,68 @@
-# OpenClawSquad Dashboard 🦞
+# OpenClawSquad Dashboard
 
-## Escritório Virtual 2D
+## Virtual Office Dashboard
 
-O OpenClawSquad inclui um dashboard visual 2D que mostra seus agentes trabalhando em tempo real.
+OpenClawSquad includes a visual 2D dashboard that shows your agents working in real-time via WebSocket.
 
-## Como Usar
+## How to Use
 
-### Opção 1: Servir Localmente
+### Option 1: Via CLI (Recommended)
 
 ```bash
-# No diretório do projeto
+npx openclawsquad dashboard
+```
+
+This starts the HTTP + WebSocket server on port 3001.
+
+### Option 2: Serve Locally
+
+```bash
 cd dashboard
-
-# Usar Python
 python3 -m http.server 3000
-
-# Ou Node.js
+# or
 npx serve .
 ```
 
-### Opção 2: Abrir Diretamente
+### Option 3: Open Directly
 
-Basta abrir o arquivo `index.html` em qualquer navegador.
+Open `index.html` in any browser (WebSocket features require the server).
 
-## Funcionalidades
+## Features
 
-### Visualização 2D dos Agentes
-- Cada agente aparece como um avatar no "escritório"
-- Cores indicam status:
-  - ⚪ Cinza: Aguardando
-  - 🟡 Amarelo: Trabalhando
-  - 🟢 Verde: Concluído
-  - 🔴 Vermelho: Erro
+### 2D Agent Visualization
+- Each agent appears as an avatar in the virtual office
+- Colors indicate status:
+  - White: Idle
+  - Yellow: Working
+  - Green: Completed
+  - Red: Error
 
-### Sidebar de Agentes
-- Lista todos os agentes do squad atual
-- Mostra status em tempo real
-- Clique para ver detalhes
+### Agent Sidebar
+- Lists all agents in the current squad
+- Shows real-time status
+- Click for details
 
-### Painel de Atividade
-- Mostra logs de atividade recentes
-- Atualiza automaticamente
-- Formato: HH:MM - Agente: Mensagem
+### Activity Panel
+- Shows recent activity logs
+- Auto-updates via WebSocket
+- Format: HH:MM - Agent: Message
 
-### Seletor de Squads
-- Conteúdo
-- Segurança
-- Dados
+### Pipeline Progress
+- Visual progress through pipeline steps
+- Checkpoint notifications with approve/reject
 
-## Integração Futura
+### API Endpoints
+- `GET /api/status` - Current system state (squads, agents, runs)
+- `GET /api/providers` - Configured LLM providers
 
-Planejado:
-- [ ] Conectar com API real do OpenClaw
-- [ ] Mostrar execução real dos agentes
-- [ ] Checkpoints visuais
-- [ ] Notificações em tempo real
+## Integration
 
----
+The dashboard connects to the pipeline runner via WebSocket. When you run a squad in another terminal, the dashboard updates in real-time:
 
-**Dashboards disponíveis em:** `dashboard/`
+```bash
+# Terminal 1: Start dashboard
+npx openclawsquad dashboard
+
+# Terminal 2: Run a squad
+npx openclawsquad run content
+```
