@@ -31,7 +31,7 @@
 |---------|-------------|
 | 🤖 **27+ Pre-built Agents** | Coordinator, Researcher, Writer, Copywriter, Reviewer, Security, Data, Marketing, and more! |
 | 📊 **Real-time Dashboard** | WebSocket-powered 2D visualization of agent workflows |
-| 🖥️ **IDE Integrations** | Claude Code, Codex, Cursor, Windsurf, Zed, Jan |
+| 🖥️ **IDE Integrations** | Claude Code, Codex, Cursor, Windsurf, Zed, Jan, OpenClaw, Gemini CLI, VS Code + Copilot |
 | ⚡ **Dynamic Squads** | Create squads on-demand with the Architect agent |
 | 🔄 **Pipeline Runner** | Execute workflows with checkpoints and handoffs |
 | 🌐 **Multi-platform** | Support for Instagram, LinkedIn, Twitter, YouTube, and more |
@@ -42,11 +42,10 @@
 ## 🚀 Quick Start
 
 ```bash
-# Install globally
-npm install -g openclawsquad
+# Interactive setup wizard (recommended)
+npx openclawsquad start
 
-# Initialize in a folder
-mkdir my-project && cd my-project
+# Or initialize manually
 npx openclawsquad init
 
 # Create a squad
@@ -59,14 +58,6 @@ npx openclawsquad run my-team
 npx openclawsquad dashboard
 ```
 
-### Without Installation
-
-```bash
-npx openclawsquad init
-npx openclawsquad create my-team
-npx openclawsquad run my-team
-```
-
 ---
 
 ## 📖 Usage
@@ -75,6 +66,7 @@ npx openclawsquad run my-team
 
 | Command | Description |
 |---------|-------------|
+| `npx openclawsquad start` | Interactive setup wizard (mode, API keys, IDE) |
 | `npx openclawsquad init` | Initialize OpenClawSquad in current folder |
 | `npx openclawsquad create <name>` | Create a new squad |
 | `npx openclawsquad run <squad>` | Execute a squad pipeline |
@@ -164,6 +156,9 @@ OpenClawSquad supports multiple IDEs:
 | **Windsurf** | `.windsurf/rules/openclawsquad.md` |
 | **Zed** | `.zed/openclawsquad.json` |
 | **Jan** (local AI) | Local AI integration |
+| **OpenClaw** | `.openclaw/config.json` |
+| **Gemini CLI** | `GEMINI.md` |
+| **VS Code + Copilot** | `.github/copilot-instructions.md` |
 
 ---
 
@@ -256,7 +251,7 @@ my-project/
 | Feature | OpenClawSquad | opensquad |
 |---------|---------------|-----------|
 | Real-time Dashboard | ✅ WebSocket | ✅ Basic |
-| IDE Integrations | 6 (Claude, Codex, Cursor, Windsurf, Zed, Jan) | 5 |
+| IDE Integrations | 9 (Claude Code, Codex, Cursor, Windsurf, Zed, Jan, OpenClaw, Gemini CLI, VS Code + Copilot) | 5 |
 | Pre-built Agents | 27+ | ~15 |
 | Dynamic Squad Creation | ✅ Architect agent | ❌ |
 | Skills System | ✅ Extensible | ✅ |
