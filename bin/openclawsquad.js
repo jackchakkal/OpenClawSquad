@@ -11,12 +11,12 @@ import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load .env early
+// Load global API keys (~/.openclawsquad/keys.json)
 try {
-  const dotenv = await import('dotenv');
-  dotenv.config();
+  const { applyGlobalKeys } = await import('../src/keys.js');
+  applyGlobalKeys();
 } catch {
-  // dotenv not installed or no .env file
+  // keys file not found or invalid — will prompt during setup
 }
 
 const { positionals, values } = parseArgs({

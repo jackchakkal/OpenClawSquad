@@ -9,19 +9,20 @@
 1. [O que e o OpenClawSquad?](#o-que-e-o-openclawsquad)
 2. [Instalacao](#instalacao)
 3. [Inicio Rapido](#inicio-rapido)
-4. [Conceitos Fundamentais](#conceitos-fundamentais)
-5. [Agentes Disponiveis](#agentes-disponiveis)
-6. [Criando Squads](#criando-squads)
-7. [Executando Pipelines](#executando-pipelines)
-8. [Dashboard](#dashboard)
-9. [Provedores de LLM](#provedores-de-llm)
-10. [Integracao com Claude Code](#integracao-com-claude-code)
-11. [Integracoes com IDEs](#integracoes-com-ides)
-12. [Configuracao](#configuracao)
-13. [Sistema de Skills](#sistema-de-skills)
-14. [Testes e Debug](#testes-e-debug)
-15. [Publicacao no npm](#publicacao-no-npm)
-16. [FAQ](#faq)
+4. [Exemplos Praticos](#exemplos-praticos)
+5. [Conceitos Fundamentais](#conceitos-fundamentais)
+6. [Agentes Disponiveis](#agentes-disponiveis)
+7. [Criando Squads](#criando-squads)
+8. [Executando Pipelines](#executando-pipelines)
+9. [Dashboard](#dashboard)
+10. [Provedores de LLM](#provedores-de-llm)
+11. [Integracao com Claude Code](#integracao-com-claude-code)
+12. [Integracoes com IDEs](#integracoes-com-ides)
+13. [Configuracao](#configuracao)
+14. [Sistema de Skills](#sistema-de-skills)
+15. [Testes e Debug](#testes-e-debug)
+16. [Publicacao no npm](#publicacao-no-npm)
+17. [FAQ](#faq)
 
 ---
 
@@ -69,29 +70,40 @@ openclawsquad --version
 
 ## Inicio Rapido
 
-### 1. Inicializar um Projeto
+### 1. Iniciar o Wizard de Configuracao
 
 ```bash
 mkdir meu-projeto && cd meu-projeto
-npx openclawsquad init
+npx openclawsquad start
 ```
 
-Isso vai:
-- Perguntar seu idioma preferido
-- Configurar integracoes de IDE
-- Instalar agentes e skills pre-construidos
-- Criar configuracao do projeto
+O wizard interativo vai guiar voce por:
+- **Selecao de modo** — Terminal CLI ou Dashboard no Browser
+- **Configuracao de chave de API** — informe sua chave uma vez, salva globalmente
+- **Integracao com IDE** — conecte ao Cursor, Claude Code, Codex, etc.
 
-### 2. Configurar Chaves de API
+Nenhuma edicao de arquivo `.env` necessaria. Sua chave de API e salva automaticamente em `~/.openclawsquad/keys.json` e carregada em toda execucao.
 
-Crie um arquivo `.env` na raiz do projeto:
+### 2. Configurar Chaves de API (apenas na primeira vez)
 
-```bash
-# Pelo menos uma e obrigatoria
-ANTHROPIC_API_KEY=sk-ant-...
-OPENAI_API_KEY=sk-...
-MINIMAX_API_KEY=...
+Durante o `npx openclawsquad start`, voce sera solicitado:
+
 ```
+Step 2/3 — Configure your LLM provider
+
+? Which LLM provider do you want to configure?
+  > Anthropic (Claude) — Recomendado - https://console.anthropic.com/
+    OpenAI (GPT) — https://platform.openai.com/
+    Minimax (M2.7) — https://platform.minimax.io/
+    Skip (configure later)
+
+? Enter your Anthropic (Claude) API key: **********************
+
+  [OK] API key saved to /home/seuusuario/.openclawsquad/keys.json
+  Provider will be auto-detected on every run.
+```
+
+Para atualizar ou adicionar uma chave depois, execute `npx openclawsquad start` novamente.
 
 ### 3. Criar Seu Primeiro Squad
 
@@ -120,7 +132,135 @@ Abra `http://localhost:3001` no navegador.
 
 ---
 
-## Conceitos Fundamentais
+## Exemplos Praticos
+
+Tres exemplos reais de como usar o OpenClawSquad para resolver problemas e gerar renda.
+
+---
+
+### Exemplo 1 — Agencia de Marketing de Conteudo
+
+**Cenario:** Voce oferece servicos de criacao de conteudo para clientes. Cada cliente precisa de posts de blog SEO semanais mais legendas para redes sociais. Fazer isso manualmente leva 4 a 6 horas por cliente.
+
+**Com o OpenClawSquad:** Automatize o pipeline completo — pesquisa, estrategia, redacao, revisao e adaptacao para redes sociais — em minutos.
+
+**Configuracao:**
+
+```bash
+mkdir agencia-conteudo && cd agencia-conteudo
+npx openclawsquad start
+npx openclawsquad create pipeline-blog
+```
+
+Ao criar o squad, adicione estes agentes em ordem:
+1. `researcher` — coleta dados, estatisticas e concorrentes do topico
+2. `strategist` — define angulo, publico-alvo e foco de palavras-chave
+3. `writer` — escreve o artigo completo otimizado para SEO
+4. `reviewer` — verifica qualidade, clareza e pontuacao SEO
+5. `copywriter` — adapta os pontos principais para Instagram, LinkedIn e X
+
+**Executando:**
+
+```bash
+npx openclawsquad run pipeline-blog
+```
+
+Quando solicitado o objetivo, informe:
+
+```
+Escreva um post de blog SEO de 1500 palavras para uma empresa SaaS que vende
+software de gestao de projetos. Palavra-chave alvo: "melhores ferramentas de
+gestao de projetos para times remotos 2025". Tom: profissional mas acessivel.
+Inclua estatisticas e um CTA claro.
+```
+
+**Resultado:** Um artigo completo + 3 legendas para redes sociais prontos para publicar, salvos em `_openclawsquad/runs/`.
+
+**Modelo de negocio:** Cobre R$1.500–4.000 por cliente/mes para posts semanais. Com 5 clientes e 10 minutos de trabalho por artigo, isso representa R$7.500–20.000/mes.
+
+---
+
+### Exemplo 2 — Servico de Auditoria de Seguranca Automatizada
+
+**Cenario:** Pequenas empresas precisam de auditorias de seguranca mas nao podem pagar consultores caros. Voce oferece relatorios de seguranca por R$2.500–7.500 cada.
+
+**Com o OpenClawSquad:** O squad `pentest` produz um relatorio estruturado de seguranca cobrindo analise de superficie de ataque, identificacao de vulnerabilidades e recomendacoes de correcao.
+
+**Configuracao:**
+
+```bash
+mkdir servico-seguranca && cd servico-seguranca
+npx openclawsquad start
+```
+
+Use o squad `pentest` pre-construido (ja incluido):
+
+```bash
+npx openclawsquad run pentest
+```
+
+Informe os detalhes do alvo quando solicitado:
+
+```
+Realize uma auditoria de seguranca para um e-commerce pequeno construido em
+WordPress. O site aceita pagamentos por cartao de credito via Stripe. Identifique
+vulnerabilidades comuns, configuracoes incorretas e forneca etapas priorizadas de
+correcao. Foco nas vulnerabilidades do OWASP Top 10.
+```
+
+**O que o pipeline faz:**
+1. `coordinator` — estrutura o escopo e metodologia da auditoria
+2. `researcher` — identifica vulnerabilidades conhecidas para o stack tecnologico
+3. `executor` — percorre sistematicamente o checklist OWASP
+4. `reviewer` — valida os achados e remove falsos positivos
+
+**Resultado:** Um relatorio profissional de seguranca em Markdown de 8 a 12 paginas, pronto para converter em PDF e entregar ao cliente.
+
+**Modelo de negocio:** Oferta auditorias por R$2.500–7.500 cada. Com 4 auditorias por mes, usando 30 minutos por auditoria para revisao e personalizacao, isso representa R$10.000–30.000/mes.
+
+---
+
+### Exemplo 3 — Relatorios de Pesquisa de Mercado para Startups
+
+**Cenario:** Fundadores e investidores precisam de pesquisa de mercado rapida antes de tomar decisoes. Empresas tradicionais de pesquisa cobram R$15.000–50.000 por relatorio e levam semanas.
+
+**Com o OpenClawSquad:** Produza um relatorio abrangente de analise de mercado em menos de uma hora por uma fracao do custo.
+
+**Configuracao:**
+
+```bash
+mkdir pesquisa-mercado && cd pesquisa-mercado
+npx openclawsquad start
+npx openclawsquad create relatorio-mercado
+```
+
+Construa o squad com:
+1. `researcher` — mapeia o mercado, players e tendencias
+2. `data-analyst` — interpreta dados, tamanho do mercado e taxas de crescimento
+3. `strategist` — identifica oportunidades, ameacas e posicionamento
+4. `summarizer` — produz o resumo executivo e principais conclusoes
+5. `writer` — formata o relatorio completo com secoes claras
+
+**Executando:**
+
+```bash
+npx openclawsquad run relatorio-mercado
+```
+
+Informe o briefing da pesquisa:
+
+```
+Crie um relatorio de pesquisa de mercado para o setor de legaltech movido a IA
+no Brasil. Inclua: tamanho do mercado e projecoes de crescimento, top 5 concorrentes
+com analise, principais dores dos clientes, cenario regulatorio e 3 oportunidades
+estrategicas para um novo entrante com budget seed de R$1 milhao.
+```
+
+**Resultado:** Um relatorio de 15 a 20 paginas estruturado com resumo executivo, analise competitiva, matriz de oportunidades e recomendacoes — pronto para entregar ou usar em suas proprias decisoes.
+
+**Modelo de negocio:** Oferta relatorios por R$1.000–4.000 cada dependendo da profundidade. Venda para: aceleradoras, VCs, fundadores de startups, corporacoes explorando novos mercados. Com 8 relatorios por mes a R$2.000 em media, isso representa R$16.000/mes.
+
+---
 
 ### Agentes
 
@@ -320,12 +460,17 @@ O OpenClawSquad suporta multiplos provedores de LLM. Configure sua chave de API 
 2. **OpenAI** - `OPENAI_API_KEY`
 3. **Minimax** - `MINIMAX_API_KEY`
 
+As chaves sao armazenadas em `~/.openclawsquad/keys.json` e carregadas automaticamente. Para adicionar ou alterar uma chave, execute `npx openclawsquad start`.
+
 ### Selecao Explicita de Provedor
 
-```bash
-# No .env
-OPENCLAWSQUAD_PROVIDER=anthropic
-OPENCLAWSQUAD_MODEL=claude-sonnet-4-20250514
+Adicione ao `openclawsquad.config.json` na raiz do projeto:
+
+```json
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514"
+}
 ```
 
 ### Verificar Configuracao
@@ -409,11 +554,10 @@ Exemplo:
 
 ### Dicas para Melhores Resultados
 
-1. **Sempre execute `openclawsquad init`** primeiro para gerar o CLAUDE.md
+1. **Sempre execute `openclawsquad start`** primeiro para gerar o CLAUDE.md e configurar sua chave de API
 2. **Use nomes de squad** ao pedir ao Claude Code para executar pipelines
 3. **Referencie nomes de agentes** para que o Claude Code use personas especificas
-4. **Configure seu `.env`** para que o pipeline runner possa chamar a API do LLM
-5. **Use o dashboard** junto com o Claude Code para monitoramento visual
+4. **Use o dashboard** junto com o Claude Code para monitoramento visual
 
 ---
 
@@ -519,8 +663,8 @@ npx openclawsquad run
 ### Problemas Comuns
 
 **"No LLM provider configured"**
-- Configure pelo menos uma chave de API no `.env`
-- Certifique-se que `dotenv` esta instalado: `npm install dotenv`
+- Execute `npx openclawsquad start` e siga a etapa de configuracao de chave de API
+- Sua chave e armazenada em `~/.openclawsquad/keys.json` e carregada automaticamente
 
 **"Squad not found"**
 - Verifique se o diretorio do squad existe em `squads/`

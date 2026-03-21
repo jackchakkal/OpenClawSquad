@@ -3,12 +3,13 @@
  * First-run experience: mode selection, API key configuration, IDE association
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createPrompt } from './prompt.js';
 import { loadLocale, t } from './i18n.js';
 import { listProviders } from './providers/index.js';
+import { saveGlobalKey, keysFilePath } from './keys.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -59,7 +60,7 @@ const PROVIDER_CHOICES = [
     label: 'Skip (configure later)',
     value: 'skip',
     envVar: null,
-    hint: 'You can set API keys in .env later'
+    hint: 'Run "openclawsquad start" again to configure later'
   }
 ];
 
@@ -178,8 +179,7 @@ async function configureApiKey(prompt, targetDir) {
   );
 
   if (providerChoice.value === 'skip') {
-    console.log('\n  Skipped. Set your API key in .env later.');
-    console.log('  See .env.example for all available options.\n');
+    console.log('\n  Skipped. Run "openclawsquad start" again to configure your API key.\n');
     return;
   }
 
@@ -194,47 +194,20 @@ async function configureApiKey(prompt, targetDir) {
     return;
   }
 
-  // Save to .env file
-  saveApiKey(targetDir, provider.envVar, apiKey.trim());
+  // Save to global config (~/.openclawsquad/keys.json)
+  saveGlobalKey(provider.envVar, apiKey.trim());
 
   // Set in current process so it takes effect immediately
   process.env[provider.envVar] = apiKey.trim();
 
-  console.log(`\n  [OK] ${provider.label} API key saved to .env`);
-  console.log(`  Provider will be auto-detected on next run.\n`);
+  console.log(`\n  [OK] ${provider.label} API key saved to ${keysFilePath()}`);
+  console.log(`  Provider will be auto-detected on every run.\n`);
 
   // Ask if they want to add another
   const addMore = await prompt.confirm('Add another provider API key?');
   if (addMore) {
     await configureApiKey(prompt, targetDir);
   }
-}
-
-/**
- * Save API key to .env file
- */
-function saveApiKey(targetDir, envVar, apiKey) {
-  const envPath = join(targetDir, '.env');
-  let envContent = '';
-
-  if (existsSync(envPath)) {
-    envContent = readFileSync(envPath, 'utf-8');
-  }
-
-  // Check if variable already exists
-  const regex = new RegExp(`^${envVar}=.*$`, 'm');
-  if (regex.test(envContent)) {
-    // Replace existing
-    envContent = envContent.replace(regex, `${envVar}=${apiKey}`);
-  } else {
-    // Append
-    if (envContent && !envContent.endsWith('\n')) {
-      envContent += '\n';
-    }
-    envContent += `${envVar}=${apiKey}\n`;
-  }
-
-  writeFileSync(envPath, envContent, 'utf-8');
 }
 
 /**
