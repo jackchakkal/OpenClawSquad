@@ -9,19 +9,20 @@
 1. [What is OpenClawSquad?](#what-is-openclawsquad)
 2. [Installation](#installation)
 3. [Quick Start](#quick-start)
-4. [Core Concepts](#core-concepts)
-5. [Available Agents](#available-agents)
-6. [Creating Squads](#creating-squads)
-7. [Running Pipelines](#running-pipelines)
-8. [Dashboard](#dashboard)
-9. [LLM Providers](#llm-providers)
-10. [Claude Code Integration](#claude-code-integration)
-11. [IDE Integrations](#ide-integrations)
-12. [Configuration](#configuration)
-13. [Skills System](#skills-system)
-14. [Testing & Debugging](#testing--debugging)
-15. [Publishing to npm](#publishing-to-npm)
-16. [FAQ](#faq)
+4. [Practical Examples](#practical-examples)
+5. [Core Concepts](#core-concepts)
+6. [Available Agents](#available-agents)
+7. [Creating Squads](#creating-squads)
+8. [Running Pipelines](#running-pipelines)
+9. [Dashboard](#dashboard)
+10. [LLM Providers](#llm-providers)
+11. [Claude Code Integration](#claude-code-integration)
+12. [IDE Integrations](#ide-integrations)
+13. [Configuration](#configuration)
+14. [Skills System](#skills-system)
+15. [Testing & Debugging](#testing--debugging)
+16. [Publishing to npm](#publishing-to-npm)
+17. [FAQ](#faq)
 
 ---
 
@@ -69,29 +70,40 @@ openclawsquad --version
 
 ## Quick Start
 
-### 1. Initialize a Project
+### 1. Start the Setup Wizard
 
 ```bash
 mkdir my-project && cd my-project
-npx openclawsquad init
+npx openclawsquad start
 ```
 
-This will:
-- Ask your preferred language
-- Set up IDE integrations
-- Install pre-built agents and skills
-- Create project configuration
+The interactive wizard will guide you through:
+- **Mode selection** — Terminal CLI or Browser Dashboard
+- **API key configuration** — enter your key once, stored globally
+- **IDE integration** — connect to Cursor, Claude Code, Codex, etc.
 
-### 2. Configure API Keys
+No `.env` file editing required. Your API key is saved automatically to `~/.openclawsquad/keys.json` and loaded on every run.
 
-Create a `.env` file in your project root:
+### 2. Configure API Keys (first run only)
 
-```bash
-# At least one is required
-ANTHROPIC_API_KEY=sk-ant-...
-OPENAI_API_KEY=sk-...
-MINIMAX_API_KEY=...
+During `npx openclawsquad start`, you will be prompted:
+
 ```
+Step 2/3 — Configure your LLM provider
+
+? Which LLM provider do you want to configure?
+  > Anthropic (Claude) — Recommended - https://console.anthropic.com/
+    OpenAI (GPT) — https://platform.openai.com/
+    Minimax (M2.7) — https://platform.minimax.io/
+    Skip (configure later)
+
+? Enter your Anthropic (Claude) API key: **********************
+
+  [OK] API key saved to /home/youruser/.openclawsquad/keys.json
+  Provider will be auto-detected on every run.
+```
+
+To update or add a key later, just run `npx openclawsquad start` again.
 
 ### 3. Create Your First Squad
 
@@ -120,7 +132,133 @@ Open `http://localhost:3001` in your browser.
 
 ---
 
-## Core Concepts
+## Practical Examples
+
+Three real-world examples of how to use OpenClawSquad to solve problems and generate income.
+
+---
+
+### Example 1 — Content Marketing Agency
+
+**Scenario:** You offer content creation services for clients. Each client needs weekly SEO blog posts plus social media captions. Doing this manually takes 4–6 hours per client.
+
+**With OpenClawSquad:** Automate the entire pipeline — research, strategy, writing, review, and social media adaptation — in minutes.
+
+**Setup:**
+
+```bash
+mkdir content-agency && cd content-agency
+npx openclawsquad start
+npx openclawsquad create blog-pipeline
+```
+
+When creating the squad, add these agents in order:
+1. `researcher` — gathers data, stats, and competitors for the topic
+2. `strategist` — defines angle, target audience, and keyword focus
+3. `writer` — writes the full SEO-optimized article
+4. `reviewer` — checks quality, clarity, and SEO score
+5. `copywriter` — adapts the key points for Instagram, LinkedIn, and X
+
+**Running it:**
+
+```bash
+npx openclawsquad run blog-pipeline
+```
+
+When prompted for the objective, enter:
+
+```
+Write a 1500-word SEO blog post for a SaaS company selling project management
+software. Target keyword: "best project management tools for remote teams 2025".
+Tone: professional but approachable. Include stats and a clear CTA.
+```
+
+**Output:** A complete article + 3 social media captions ready to publish, saved in `_openclawsquad/runs/`.
+
+**Business model:** Charge $300–800 per client/month for weekly blog posts. With 5 clients and 10 minutes of work per article, that is $1,500–4,000/month.
+
+---
+
+### Example 2 — Automated Security Audit Service
+
+**Scenario:** Small businesses need security audits but cannot afford expensive consultants. You offer lightweight security reports for $500–$1,500 each.
+
+**With OpenClawSquad:** The `pentest` squad produces a structured security report covering attack surface analysis, vulnerability identification, and remediation recommendations.
+
+**Setup:**
+
+```bash
+mkdir security-service && cd security-service
+npx openclawsquad start
+```
+
+Use the pre-built `pentest` squad (already included):
+
+```bash
+npx openclawsquad run pentest
+```
+
+Enter the target details when prompted:
+
+```
+Perform a security audit for a small e-commerce website built on WordPress.
+The site accepts credit card payments via Stripe. Identify common vulnerabilities,
+misconfigurations, and provide prioritized remediation steps. Focus on OWASP Top 10.
+```
+
+**What the pipeline does:**
+1. `coordinator` — structures the audit scope and methodology
+2. `researcher` — identifies known vulnerabilities for the tech stack
+3. `executor` — runs through the OWASP checklist systematically
+4. `reviewer` — validates findings and removes false positives
+
+**Output:** A professional 8–12 page security report in Markdown, ready to convert to PDF and deliver to the client.
+
+**Business model:** Offer audits at $500–$1,500 each. With 4 audits per month, using 30 minutes per audit for review and customization, that is $2,000–6,000/month.
+
+---
+
+### Example 3 — Market Research Reports for Startups
+
+**Scenario:** Founders and investors need quick market research before making decisions. Traditional research firms charge $3,000–$10,000 per report and take weeks.
+
+**With OpenClawSquad:** Produce a comprehensive market analysis report in under an hour for a fraction of the cost.
+
+**Setup:**
+
+```bash
+mkdir research-service && cd research-service
+npx openclawsquad start
+npx openclawsquad create market-report
+```
+
+Build the squad with:
+1. `researcher` — maps the market, players, and trends
+2. `data-analyst` — interprets data, market size, and growth rates
+3. `strategist` — identifies opportunities, threats, and positioning
+4. `summarizer` — produces the executive summary and key takeaways
+5. `writer` — formats the full report with clear sections
+
+**Running it:**
+
+```bash
+npx openclawsquad run market-report
+```
+
+Enter the research brief:
+
+```
+Create a market research report for the AI-powered legal tech sector in Brazil.
+Include: market size and growth projections, top 5 competitors with analysis,
+main customer pain points, regulatory landscape, and 3 strategic opportunities
+for a new entrant with a $200k seed budget.
+```
+
+**Output:** A 15–20 page market report structured with executive summary, competitive analysis, opportunity matrix, and recommendations — ready to deliver or use for your own decisions.
+
+**Business model:** Offer reports at $200–$800 each depending on depth. Sell to: accelerators, VCs, startup founders, corporates exploring new markets. With 8 reports per month at an average of $400, that is $3,200/month.
+
+---
 
 ### Agents
 
@@ -338,12 +476,17 @@ OpenClawSquad supports multiple LLM providers. Set your API key and the system a
 2. **OpenAI** - `OPENAI_API_KEY`
 3. **Minimax** - `MINIMAX_API_KEY`
 
+Keys are stored in `~/.openclawsquad/keys.json` and loaded automatically. To add or change a key, run `npx openclawsquad start`.
+
 ### Explicit Provider Selection
 
-```bash
-# In .env
-OPENCLAWSQUAD_PROVIDER=anthropic
-OPENCLAWSQUAD_MODEL=claude-sonnet-4-20250514
+Add to `openclawsquad.config.json` in your project root:
+
+```json
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514"
+}
 ```
 
 ### Check Configuration
@@ -427,11 +570,10 @@ Example:
 
 ### Tips for Best Results
 
-1. **Always run `openclawsquad init`** first to generate the CLAUDE.md
+1. **Always run `openclawsquad start`** first to generate CLAUDE.md and configure your API key
 2. **Use squad names** when asking Claude Code to run pipelines
 3. **Reference agent names** to get Claude Code to use specific personas
-4. **Set up your `.env`** so the pipeline runner can call the LLM API
-5. **Use the dashboard** alongside Claude Code for visual monitoring
+4. **Use the dashboard** alongside Claude Code for visual monitoring
 
 ---
 
@@ -542,8 +684,8 @@ npx openclawsquad run
 ### Common Issues
 
 **"No LLM provider configured"**
-- Set at least one API key in `.env`
-- Make sure `dotenv` is installed: `npm install dotenv`
+- Run `npx openclawsquad start` and follow the API key setup step
+- Your key is stored in `~/.openclawsquad/keys.json` and auto-loaded
 
 **"Squad not found"**
 - Check that the squad directory exists under `squads/`
