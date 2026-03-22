@@ -7,9 +7,11 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
+import { loadConfig, resetConfig, saveConfig } from './config.js';
+import { loadGlobalKeys, saveGlobalKey, removeGlobalKey, applyGlobalKeys } from './keys.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -22,6 +24,114 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg'
 };
 
+// Known API key names for the config panel
+const API_KEY_NAMES = [
+  'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'MINIMAX_API_KEY',
+  'INSTAGRAM_ACCESS_TOKEN', 'INSTAGRAM_USER_ID',
+  'IMGBB_API_KEY', 'APIFY_TOKEN'
+];
+
+// Available agents list (mirrored from agents-cli.js)
+const AVAILABLE_AGENTS = [
+  { id: 'architect', name: 'Architect', description: 'Creates squads dynamically' },
+  { id: 'coordinator', name: 'Coordinator', description: 'Orchestrates squad workflows' },
+  { id: 'researcher', name: 'Researcher', description: 'Search and gather information' },
+  { id: 'scraper', name: 'Scraper', description: 'Web scraping specialist' },
+  { id: 'strategist', name: 'Strategist', description: 'Planning and strategy' },
+  { id: 'writer', name: 'Writer', description: 'Content creation' },
+  { id: 'copywriter', name: 'Copywriter', description: 'Marketing copy' },
+  { id: 'executor', name: 'Executor', description: 'Execute tasks' },
+  { id: 'reviewer', name: 'Reviewer', description: 'Quality assurance' },
+  { id: 'codereviewer', name: 'Code Reviewer', description: 'Code quality review' },
+  { id: 'tester', name: 'Tester', description: 'Testing specialist' },
+  { id: 'pentester', name: 'Pentester', description: 'Security testing' },
+  { id: 'securityauditor', name: 'Security Auditor', description: 'Security audit' },
+  { id: 'bughunter', name: 'Bug Hunter', description: 'Bug hunting' },
+  { id: 'debugger', name: 'Debugger', description: 'Debugging specialist' },
+  { id: 'dataanalyst', name: 'Data Analyst', description: 'Data analysis' },
+  { id: 'visualizer', name: 'Visualizer', description: 'Data visualization' },
+  { id: 'seoexpert', name: 'SEO Expert', description: 'SEO optimization' },
+  { id: 'socialmediamanager', name: 'Social Media Manager', description: 'Social media' },
+  { id: 'translator', name: 'Translator', description: 'Translation' },
+  { id: 'summarizer', name: 'Summarizer', description: 'Summarization' },
+  { id: 'tutor', name: 'Tutor', description: 'Teaching' },
+  { id: 'productspecialist', name: 'Product Specialist', description: 'Product expertise' },
+  { id: 'salesscript', name: 'Sales Script', description: 'Sales scripting' },
+  { id: 'videoextractor', name: 'Video Extractor', description: 'Video extraction' },
+  { id: 'videolearner', name: 'Video Learner', description: 'Video learning' },
+  { id: 'designer', name: 'Designer', description: 'Design specialist' },
+];
+
+const AGENT_CATEGORIES = {
+  'Coordination': ['coordinator'],
+  'Intelligence': ['researcher', 'scraper'],
+  'Planning': ['strategist'],
+  'Content': ['writer', 'copywriter', 'designer'],
+  'Execution': ['executor'],
+  'Quality': ['reviewer', 'codereviewer', 'tester'],
+  'Security': ['pentester', 'securityauditor', 'bughunter', 'debugger'],
+  'Development': ['architect'],
+  'Data': ['dataanalyst', 'visualizer'],
+  'Marketing': ['seoexpert', 'socialmediamanager'],
+  'Communication': ['translator', 'summarizer', 'tutor'],
+  'Specialists': ['productspecialist', 'salesscript', 'videoextractor', 'videolearner'],
+};
+
+// Track the target directory for config operations
+let _targetDir = process.cwd();
+
+/**
+ * Parse JSON body from an incoming request
+ */
+function parseBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => {
+      try {
+        resolve(JSON.parse(Buffer.concat(chunks).toString()));
+      } catch {
+        reject(new Error('Invalid JSON'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+/**
+ * Mask an API key value, showing only last 4 characters
+ */
+function maskKey(value) {
+  if (!value || value.length < 5) return '****';
+  return '****' + value.slice(-4);
+}
+
+/**
+ * Read agent .md file frontmatter for icon/title
+ */
+function loadAgentIcons() {
+  const agentsDir = join(__dirname, '..', 'agents');
+  const icons = {};
+  if (!existsSync(agentsDir)) return icons;
+  try {
+    const files = readdirSync(agentsDir).filter(f => f.endsWith('.agent.md'));
+    for (const file of files) {
+      const content = readFileSync(join(agentsDir, file), 'utf-8');
+      const match = content.match(/^---\n([\s\S]*?)\n---/);
+      if (match) {
+        const frontmatter = match[1];
+        const idMatch = file.replace('.agent.md', '');
+        const iconMatch = frontmatter.match(/^icon:\s*(.+)$/m);
+        const titleMatch = frontmatter.match(/^title:\s*(.+)$/m);
+        if (iconMatch) icons[idMatch] = { icon: iconMatch[1].trim(), title: titleMatch ? titleMatch[1].trim() : '' };
+      }
+    }
+  } catch {
+    // ignore read errors
+  }
+  return icons;
+}
+
 // System state
 const state = {
   squads: new Map(),
@@ -33,10 +143,10 @@ const state = {
 
 function createDashboardServer(port = 3001) {
   // Simple HTTP server
-  const server = http.createServer((req, res) => {
+  const server = http.createServer(async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
@@ -66,6 +176,92 @@ function createDashboardServer(port = 3001) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end('[]');
       });
+      return;
+    }
+
+    // Config API: GET /api/config
+    if (req.url === '/api/config' && req.method === 'GET') {
+      try {
+        resetConfig();
+        const config = loadConfig(_targetDir);
+        const keys = loadGlobalKeys();
+        const keyStatus = {};
+        for (const keyName of API_KEY_NAMES) {
+          const val = keys[keyName] || process.env[keyName] || '';
+          keyStatus[keyName] = { exists: !!val, masked: val ? maskKey(val) : '' };
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ config, keys: keyStatus }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // Config API: POST /api/config
+    if (req.url === '/api/config' && req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        const saved = saveConfig(_targetDir, body);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, config: saved }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // Keys API: POST /api/keys
+    if (req.url === '/api/keys' && req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        if (!body.key || !body.value) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing key or value' }));
+          return;
+        }
+        saveGlobalKey(body.key, body.value);
+        applyGlobalKeys();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // Keys API: DELETE /api/keys/:name
+    if (req.url.startsWith('/api/keys/') && req.method === 'DELETE') {
+      try {
+        const keyName = decodeURIComponent(req.url.split('/api/keys/')[1]);
+        removeGlobalKey(keyName);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // Agents API: GET /api/agents
+    if (req.url === '/api/agents' && req.method === 'GET') {
+      try {
+        const icons = loadAgentIcons();
+        const agents = AVAILABLE_AGENTS.map(a => ({
+          ...a,
+          icon: icons[a.id]?.icon || '',
+          title: icons[a.id]?.title || a.name,
+        }));
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ agents, categories: AGENT_CATEGORIES }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
       return;
     }
 
@@ -231,6 +427,9 @@ export function createPipelineStatusCallback() {
 export { updateAgentStatus, startSquad, addActivity, broadcast, state };
 
 export async function startDashboard(targetDir, port = 3001) {
+  // Set target dir for config operations
+  _targetDir = targetDir || process.cwd();
+
   // Load .env if available
   try {
     const dotenv = await import('dotenv');
