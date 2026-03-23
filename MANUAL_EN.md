@@ -260,6 +260,154 @@ for a new entrant with a $200k seed budget.
 
 ---
 
+#### Example 4 — Instagram Carousel: Text-Only HTML-to-Image Pipeline
+
+**What it does:** Creates educational carousels for Instagram using HTML/CSS rendered to PNG images. No design skills required — the AI handles layout, typography, and colors.
+
+**Squad:** `carousel-creator`
+
+**Pipeline:**
+1. `strategist` — defines carousel topic, hook angle, slide breakdown (5–8 slides)
+2. `copywriter` — writes text for each slide (concise, scroll-stopping)
+3. `designer` — creates HTML/CSS for each slide at 1080×1440, uses the `image-creator` skill to render to PNG
+4. `reviewer` — checks visual quality, text legibility, brand consistency
+5. `socialmediamanager` — writes the caption with hashtags, optimized for engagement
+
+**Key technical detail:** The designer agent uses the `image-creator` skill. Each slide is a self-contained HTML file with inline CSS (Google Fonts via `@import`, gradient backgrounds, large typography). Playwright renders each at 1080×1440 viewport. If Playwright/image-creator is unavailable, the designer generates detailed image prompts instead — describing exact layout, colors, typography, and text content for each slide.
+
+**Running it:**
+
+```bash
+npx openclawsquad run carousel-creator
+```
+
+Enter the objective:
+
+```
+Create a 7-slide Instagram carousel about "5 Morning Habits That Changed My Life".
+Style: minimalist, dark background (#1a1a2e), accent color #e94560,
+font: Inter. Each slide should have one key point with a brief explanation.
+Slide 1: hook. Slide 7: CTA. Render as images at 1080x1440.
+```
+
+**Output:** 7 PNG images ready to upload as an Instagram carousel, plus a caption with hashtags.
+
+**Business model:** Offer carousel creation as a service at $50–$150 per carousel. Target: coaches, consultants, personal brands. With 20 carousels/month at $80 average, that is $1,600/month.
+
+---
+
+#### Example 5 — Instagram Product Launch Campaign with Image Fallback
+
+**What it does:** Plans and creates a coordinated Instagram campaign for a product launch — teaser posts, launch carousel, and follow-up content. When product photography is needed (not renderable by AI), generates structured image prompts with exact specifications.
+
+**Squad:** `instagram-launch`
+
+**Pipeline:**
+1. `researcher` — analyzes competitor launches and trending formats on Instagram
+2. `strategist` — plans 5-post campaign sequence (2 teasers, 1 launch carousel, 2 follow-ups)
+3. `copywriter` — writes copy for each post
+4. `designer` — creates visual assets using `image-creator`; for posts requiring product photos, generates image prompts with exact specifications
+5. `socialmediamanager` — finalizes captions, hashtag strategy, and posting schedule; uses `instagram-publisher` to publish when ready
+
+**Fallback behavior:** When the designer cannot render an image (e.g., product photography needed, or Playwright unavailable), it outputs a structured prompt block:
+
+```
+[IMAGE PROMPT - Slide 3]
+Aspect: 1080x1350 (4:5)
+Background: product photo of [item] on white marble surface
+Text overlay: "Now Available" in Montserrat Bold 58px, color #2d3436
+Layout: product centered, text bottom-third
+Style: clean, minimal, luxury feel
+```
+
+**Running it:**
+
+```bash
+npx openclawsquad run instagram-launch
+```
+
+Enter the objective:
+
+```
+Plan and create a 5-post Instagram campaign for launching a new organic skincare line.
+Brand colors: #2d3436 and #dfe6e9. Tone: clean, luxury, minimalist.
+Include 2 teasers, 1 launch carousel (5 slides), and 2 follow-up posts.
+```
+
+**Output:** 5 complete posts with captions, hashtags, and visual assets (or image prompts for photography).
+
+**Business model:** Offer launch campaigns at $300–$800 per campaign. Target: e-commerce brands, DTC startups. With 4 campaigns/month at $500, that is $2,000/month.
+
+---
+
+#### Example 6 — LinkedIn Thought Leadership Content Series
+
+**What it does:** Creates a full week of LinkedIn content for B2B professionals — one long-form text post, one carousel (PDF-style slides), and one poll. All optimized for LinkedIn's algorithm.
+
+**Squad:** `linkedin-authority`
+
+**Pipeline:**
+1. `researcher` — identifies trending topics in the target industry from LinkedIn, news, and competitor posts
+2. `strategist` — picks the week's theme, maps it to 3 content formats (long post, carousel, poll)
+3. `writer` — writes the long-form LinkedIn post (hook in first line, storytelling structure, CTA)
+4. `designer` — creates carousel slides as HTML rendered at 1200×627 (LinkedIn optimal); generates PDF-style slides with data points, quotes, and frameworks
+5. `socialmediamanager` — writes the poll question with 4 options, schedules all 3 posts across the week at optimal times (Tue/Wed/Thu mornings)
+
+**Running it:**
+
+```bash
+npx openclawsquad run linkedin-authority
+```
+
+Enter the objective:
+
+```
+Create a week of LinkedIn content for a fintech CEO. Topic: "Why most startups
+fail at B2B sales." Format: 1 long-form post (Tuesday), 1 carousel with 6 slides
+(Wednesday), 1 poll (Thursday). Tone: confident but approachable. Include data
+points and a contrarian take.
+```
+
+**Output:** 3 ready-to-publish LinkedIn pieces: a long-form post (~1,200 words), a 6-slide carousel (as images or HTML), and a poll with 4 options.
+
+**Business model:** Offer weekly LinkedIn packages at $200–$500/week. Target: B2B founders, executives, consultants. With 6 clients at $300/week, that is $7,200/month.
+
+---
+
+#### Example 7 — X (Twitter) Thread + Newsletter Repurpose Pipeline
+
+**What it does:** Takes a newsletter edition and repurposes it into an X (Twitter) thread with quote-graphic images. Maximizes reach by turning one piece of content into shareable, platform-native formats.
+
+**Squad:** `content-repurpose`
+
+**Pipeline:**
+1. `summarizer` — reads the newsletter content and extracts 5–7 key insights, preserving the original voice
+2. `copywriter` — transforms each insight into a tweet-length post (280 chars max) forming a coherent thread; adds a hook tweet and a closing CTA tweet
+3. `designer` — creates 3 quote-graphic images (1200×675 for X) from the strongest insights using `image-creator`; if image creation fails, outputs prompts for each graphic
+4. `socialmediamanager` — assembles the final thread with numbered tweets, determines which tweets get the quote-graphic attached, and suggests optimal posting time
+
+**Running it:**
+
+```bash
+npx openclawsquad run content-repurpose
+```
+
+Enter the objective:
+
+```
+Repurpose this newsletter into an X (Twitter) thread with quote graphics:
+[paste newsletter content or provide file path]
+Thread style: numbered insights, conversational tone. Create 3 quote cards
+at 1200x675 with the most shareable insights. Brand colors: #1DA1F2 accent
+on dark background.
+```
+
+**Output:** A complete thread (8–12 tweets) with 3 quote-graphic images, ready to post.
+
+**Business model:** Offer repurposing packages at $100–$250 per newsletter. Target: newsletter writers, content creators, thought leaders. With 15 conversions/month at $150, that is $2,250/month.
+
+---
+
 ### Agents
 
 An **agent** is a specialized AI persona defined in a `.agent.md` file. Each agent has:

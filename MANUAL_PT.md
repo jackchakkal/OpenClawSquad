@@ -262,6 +262,154 @@ estrategicas para um novo entrante com budget seed de R$1 milhao.
 
 ---
 
+#### Exemplo 4 — Carrossel Instagram: Pipeline HTML-para-Imagem (Somente Texto)
+
+**O que faz:** Cria carrosseis educativos para Instagram usando HTML/CSS renderizado em imagens PNG. Nao precisa de habilidades de design — a IA cuida do layout, tipografia e cores.
+
+**Squad:** `carousel-creator`
+
+**Pipeline:**
+1. `strategist` — define o topico do carrossel, angulo do gancho, divisao dos slides (5–8 slides)
+2. `copywriter` — escreve o texto de cada slide (conciso, que prenda a atencao)
+3. `designer` — cria HTML/CSS para cada slide em 1080×1440, usa a skill `image-creator` para renderizar em PNG
+4. `reviewer` — verifica qualidade visual, legibilidade do texto, consistencia da marca
+5. `socialmediamanager` — escreve a legenda com hashtags, otimizada para engajamento
+
+**Detalhe tecnico:** O agente designer usa a skill `image-creator`. Cada slide e um arquivo HTML independente com CSS inline (Google Fonts via `@import`, fundos com gradiente, tipografia grande). O Playwright renderiza cada um em viewport 1080×1440. Se o Playwright/image-creator nao estiver disponivel, o designer gera prompts detalhados para cada slide — descrevendo layout, cores, tipografia e conteudo de texto.
+
+**Executando:**
+
+```bash
+npx openclawsquad run carousel-creator
+```
+
+Insira o objetivo:
+
+```
+Crie um carrossel de 7 slides para Instagram sobre "5 Habitos Matinais Que Mudaram Minha Vida".
+Estilo: minimalista, fundo escuro (#1a1a2e), cor de destaque #e94560,
+fonte: Inter. Cada slide deve ter um ponto-chave com uma breve explicacao.
+Slide 1: gancho. Slide 7: CTA. Renderizar como imagens em 1080x1440.
+```
+
+**Resultado:** 7 imagens PNG prontas para upload como carrossel no Instagram, mais legenda com hashtags.
+
+**Modelo de negocio:** Oferte criacao de carrosseis por R$250–R$750 por carrossel. Publico: coaches, consultores, marcas pessoais. Com 20 carrosseis/mes a R$400 em media, isso representa R$8.000/mes.
+
+---
+
+#### Exemplo 5 — Campanha de Lancamento no Instagram com Fallback de Imagem
+
+**O que faz:** Planeja e cria uma campanha coordenada no Instagram para lancamento de produto — posts teaser, carrossel de lancamento e conteudo de acompanhamento. Quando fotografia de produto e necessaria (nao renderizavel pela IA), gera prompts de imagem estruturados com especificacoes exatas.
+
+**Squad:** `instagram-launch`
+
+**Pipeline:**
+1. `researcher` — analisa lancamentos de concorrentes e formatos em alta no Instagram
+2. `strategist` — planeja sequencia de 5 posts (2 teasers, 1 carrossel de lancamento, 2 follow-ups)
+3. `copywriter` — escreve o copy de cada post
+4. `designer` — cria assets visuais usando `image-creator`; para posts que precisam de fotos de produto, gera prompts de imagem com especificacoes exatas
+5. `socialmediamanager` — finaliza legendas, estrategia de hashtags e cronograma de postagens; usa `instagram-publisher` para publicar quando pronto
+
+**Comportamento de fallback:** Quando o designer nao consegue renderizar uma imagem (ex: fotografia de produto necessaria, ou Playwright indisponivel), ele gera um bloco de prompt estruturado:
+
+```
+[PROMPT DE IMAGEM - Slide 3]
+Proporcao: 1080x1350 (4:5)
+Fundo: foto de produto de [item] em superficie de marmore branco
+Texto overlay: "Disponivel Agora" em Montserrat Bold 58px, cor #2d3436
+Layout: produto centralizado, texto no terco inferior
+Estilo: limpo, minimalista, sensacao de luxo
+```
+
+**Executando:**
+
+```bash
+npx openclawsquad run instagram-launch
+```
+
+Insira o objetivo:
+
+```
+Planeje e crie uma campanha de 5 posts no Instagram para lancar uma nova linha de
+cosmeticos organicos. Cores da marca: #2d3436 e #dfe6e9. Tom: limpo, luxo, minimalista.
+Incluir 2 teasers, 1 carrossel de lancamento (5 slides) e 2 posts de acompanhamento.
+```
+
+**Resultado:** 5 posts completos com legendas, hashtags e assets visuais (ou prompts de imagem para fotografia).
+
+**Modelo de negocio:** Oferte campanhas de lancamento por R$1.500–R$4.000 por campanha. Publico: marcas de e-commerce, startups DTC. Com 4 campanhas/mes a R$2.500, isso representa R$10.000/mes.
+
+---
+
+#### Exemplo 6 — Serie de Conteudo LinkedIn para Thought Leadership
+
+**O que faz:** Cria uma semana completa de conteudo no LinkedIn para profissionais B2B — um post longo, um carrossel (slides estilo PDF) e uma enquete. Tudo otimizado para o algoritmo do LinkedIn.
+
+**Squad:** `linkedin-authority`
+
+**Pipeline:**
+1. `researcher` — identifica topicos em alta no setor-alvo a partir do LinkedIn, noticias e posts de concorrentes
+2. `strategist` — escolhe o tema da semana, mapeia para 3 formatos de conteudo (post longo, carrossel, enquete)
+3. `writer` — escreve o post longo do LinkedIn (gancho na primeira linha, estrutura de storytelling, CTA)
+4. `designer` — cria slides do carrossel como HTML renderizado em 1200×627 (otimo para LinkedIn); gera slides estilo PDF com dados, citacoes e frameworks
+5. `socialmediamanager` — escreve a pergunta da enquete com 4 opcoes, agenda os 3 posts ao longo da semana nos melhores horarios (Ter/Qua/Qui de manha)
+
+**Executando:**
+
+```bash
+npx openclawsquad run linkedin-authority
+```
+
+Insira o objetivo:
+
+```
+Crie uma semana de conteudo no LinkedIn para um CEO de fintech. Topico: "Por que a maioria
+das startups falha em vendas B2B." Formato: 1 post longo (terca), 1 carrossel com 6 slides
+(quarta), 1 enquete (quinta). Tom: confiante mas acessivel. Incluir dados
+e uma visao contraria.
+```
+
+**Resultado:** 3 pecas de conteudo prontas para publicar no LinkedIn: um post longo (~1.200 palavras), um carrossel de 6 slides (como imagens ou HTML) e uma enquete com 4 opcoes.
+
+**Modelo de negocio:** Oferte pacotes semanais de LinkedIn por R$1.000–R$2.500/semana. Publico: fundadores B2B, executivos, consultores. Com 6 clientes a R$1.500/semana, isso representa R$36.000/mes.
+
+---
+
+#### Exemplo 7 — Thread no X (Twitter) + Pipeline de Repurpose de Newsletter
+
+**O que faz:** Pega uma edicao de newsletter e transforma em uma thread no X (Twitter) com imagens de citacao. Maximiza o alcance transformando um unico conteudo em formatos nativos e compartilhaveis para cada plataforma.
+
+**Squad:** `content-repurpose`
+
+**Pipeline:**
+1. `summarizer` — le o conteudo da newsletter e extrai 5–7 insights-chave, preservando a voz original
+2. `copywriter` — transforma cada insight em um post de tamanho de tweet (280 caracteres max) formando uma thread coerente; adiciona tweet de gancho e tweet de CTA no final
+3. `designer` — cria 3 imagens de citacao (1200×675 para X) a partir dos insights mais compartilhaveis usando `image-creator`; se a criacao de imagem falhar, gera prompts para cada grafico
+4. `socialmediamanager` — monta a thread final com tweets numerados, determina quais tweets recebem a imagem de citacao e sugere o melhor horario para postar
+
+**Executando:**
+
+```bash
+npx openclawsquad run content-repurpose
+```
+
+Insira o objetivo:
+
+```
+Transforme esta newsletter em uma thread no X (Twitter) com graficos de citacao:
+[cole o conteudo da newsletter ou forneca o caminho do arquivo]
+Estilo da thread: insights numerados, tom conversacional. Crie 3 cards de citacao
+em 1200x675 com os insights mais compartilhaveis. Cores da marca: #1DA1F2 destaque
+em fundo escuro.
+```
+
+**Resultado:** Uma thread completa (8–12 tweets) com 3 imagens de citacao, pronta para postar.
+
+**Modelo de negocio:** Oferte pacotes de repurpose por R$500–R$1.250 por newsletter. Publico: escritores de newsletter, criadores de conteudo, thought leaders. Com 15 conversoes/mes a R$750, isso representa R$11.250/mes.
+
+---
+
 ### Agentes
 
 Um **agente** e uma persona de IA especializada definida em um arquivo `.agent.md`. Cada agente possui:

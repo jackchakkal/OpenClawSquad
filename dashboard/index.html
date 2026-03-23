@@ -60,6 +60,29 @@
             font-size: 24px;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .lang-toggle {
+            padding: 6px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 20px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .lang-toggle:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
         .connection-status {
             display: flex;
             align-items: center;
@@ -452,6 +475,380 @@
         .log-line.error {
             color: var(--error);
         }
+
+        /* Config Modal */
+        .config-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .config-modal.show {
+            display: flex;
+        }
+
+        .config-panel {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--accent-dim);
+            width: 580px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px 0;
+        }
+
+        .config-header h2 {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .config-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .config-close:hover { color: var(--text); }
+
+        .config-tabs {
+            display: flex;
+            gap: 0;
+            padding: 16px 24px 0;
+            border-bottom: 1px solid var(--accent-dim);
+        }
+
+        .config-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .config-tab:hover { color: var(--text); }
+
+        .config-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .config-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .config-tab-content { display: none; }
+        .config-tab-content.active { display: block; }
+
+        .config-section {
+            margin-bottom: 20px;
+        }
+
+        .config-section h4 {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .config-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .config-field label {
+            min-width: 160px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .config-field .key-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .config-field .key-status.exists { background: var(--success); }
+        .config-field .key-status.empty { background: var(--text-dim); }
+
+        .config-input {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .config-select {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .config-range-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-range-wrap input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent);
+        }
+
+        .config-range-wrap .range-val {
+            min-width: 35px;
+            text-align: right;
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .config-key-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .config-key-row label {
+            min-width: 180px;
+            font-size: 13px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .config-key-row input {
+            flex: 1;
+            padding: 7px 10px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .config-key-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .config-btn-sm {
+            padding: 6px 12px;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .config-btn-sm:hover { opacity: 0.8; }
+
+        .config-btn-sm.danger {
+            background: var(--error);
+            color: #fff;
+        }
+
+        .config-save-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: opacity 0.2s;
+        }
+
+        .config-save-btn:hover { opacity: 0.85; }
+
+        .config-status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--accent-dim);
+            font-size: 13px;
+        }
+
+        .config-status-row:last-child { border-bottom: none; }
+
+        .config-status-row .name { color: var(--text-dim); min-width: 180px; }
+        .config-status-row .value { color: var(--text); font-family: monospace; }
+        .config-status-row .badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .config-status-row .badge.ok { background: var(--success); color: #000; }
+        .config-status-row .badge.missing { background: var(--text-dim); color: #000; }
+
+        /* Agent Catalog Panel */
+        .agents-catalog {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 380px;
+            height: 100%;
+            background: var(--bg-card);
+            border-left: 1px solid var(--accent-dim);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+        }
+
+        .agents-catalog.show {
+            display: flex;
+        }
+
+        .catalog-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--accent-dim);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .catalog-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .catalog-header h3 {
+            font-size: 16px;
+            color: var(--accent);
+        }
+
+        .catalog-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .catalog-close:hover { color: var(--text); }
+
+        .catalog-search {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .catalog-search:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .catalog-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 20px;
+        }
+
+        .catalog-category {
+            margin-bottom: 16px;
+        }
+
+        .catalog-category h4 {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--accent-dim);
+        }
+
+        .catalog-agent {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: default;
+            transition: background 0.15s;
+        }
+
+        .catalog-agent:hover {
+            background: var(--accent-dim);
+        }
+
+        .catalog-agent-icon {
+            font-size: 20px;
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .catalog-agent-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .catalog-agent-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .catalog-agent-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -460,15 +857,19 @@
             <div class="logo-icon">🦞</div>
             <h1>OpenClawSquad</h1>
         </div>
-        <div class="connection-status">
-            <span class="status-dot" id="wsStatus"></span>
-            <span id="wsText">Conectando...</span>
+        <div class="header-actions">
+            <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
+            <button class="lang-toggle" onclick="openConfig()" title="Settings">⚙</button>
+            <div class="connection-status">
+                <span class="status-dot" id="wsStatus"></span>
+                <span id="wsText" data-i18n="connecting">Connecting...</span>
+            </div>
         </div>
     </header>
 
     <main class="main">
         <aside class="sidebar">
-            <h2>Agentes</h2>
+            <h2 data-i18n="agents">Agents</h2>
             <div class="agent-list" id="agentList"></div>
         </aside>
 
@@ -477,33 +878,46 @@
             <div class="agents-on-office" id="office"></div>
 
             <div class="pipeline-flow" id="pipeline">
-                <div class="pipeline-step" data-step="1">🔍 Pesquisa</div>
+                <div class="pipeline-step" data-step="1">🔍 <span data-i18n="research">Research</span></div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="2">🧠 Strategy</div>
+                <div class="pipeline-step" data-step="2">🧠 <span data-i18n="strategy">Strategy</span></div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="3">✍️ Creation</div>
+                <div class="pipeline-step" data-step="3">✍️ <span data-i18n="creation">Creation</span></div>
                 <span class="pipeline-arrow">→</span>
-                <div class="pipeline-step" data-step="4">✅ Review</div>
+                <div class="pipeline-step" data-step="4">✅ <span data-i18n="review">Review</span></div>
             </div>
 
             <div class="controls">
-                <button class="control-btn" onclick="runDemo()">▶️ Executar Squad</button>
-                <button class="control-btn" onclick="toggleConsole()">📝 Console</button>
+                <button class="control-btn" onclick="runDemo()">▶️ <span data-i18n="runSquad">Run Squad</span></button>
+                <button class="control-btn" onclick="toggleConsole()">📝 <span data-i18n="console">Console</span></button>
+                <button class="control-btn" onclick="toggleAgentsCatalog()">🤖 <span data-i18n="agentCatalog">Agent Catalog</span></button>
             </div>
 
             <div class="agent-detail" id="agentDetail">
-                <h3 id="detailName">Agente</h3>
-                <p class="role" id="detailRole">Papel</p>
+                <h3 id="detailName" data-i18n="agent">Agent</h3>
+                <p class="role" id="detailRole" data-i18n="role">Role</p>
                 <div class="task">
-                    <div class="task-label">Tarefa atual:</div>
+                    <div class="task-label" data-i18n="currentTask">Current task:</div>
                     <div id="detailTask">-</div>
                 </div>
             </div>
 
             <div class="log-console" id="logConsole"></div>
 
+            <!-- Agent Catalog Panel -->
+            <div class="agents-catalog" id="agentsCatalog">
+                <div class="catalog-header">
+                    <div class="catalog-header-top">
+                        <h3 data-i18n="agentCatalog">Agent Catalog</h3>
+                        <button class="catalog-close" onclick="closeAgentsCatalog()">&times;</button>
+                    </div>
+                    <input type="text" class="catalog-search" id="catalogSearch" data-i18n-placeholder="searchAgents" placeholder="Search agents..." oninput="filterAgents(this.value)">
+                </div>
+                <div class="catalog-body" id="catalogBody"></div>
+            </div>
+
             <div class="activity-panel">
-                <h3>Atividade em Tempo Real</h3>
+                <h3 data-i18n="realTimeActivity">Real-Time Activity</h3>
                 <div id="activityList"></div>
             </div>
         </div>
@@ -511,32 +925,194 @@
 
     <div class="checkpoint-modal" id="checkpointModal">
         <div class="checkpoint-content">
-            <h2>⏸️ Checkpoint</h2>
+            <h2>⏸️ <span data-i18n="checkpoint">Checkpoint</span></h2>
             <p id="checkpointMessage">Approval required to continue</p>
-            <button class="checkpoint-btn approve" onclick="approveCheckpoint()">✅ Aprovar</button>
-            <button class="checkpoint-btn reject" onclick="rejectCheckpoint()">❌ Rejeitar</button>
+            <button class="checkpoint-btn approve" onclick="approveCheckpoint()">✅ <span data-i18n="approve">Approve</span></button>
+            <button class="checkpoint-btn reject" onclick="rejectCheckpoint()">❌ <span data-i18n="reject">Reject</span></button>
+        </div>
+    </div>
+
+    <!-- Config Modal -->
+    <div class="config-modal" id="configModal">
+        <div class="config-panel">
+            <div class="config-header">
+                <h2 data-i18n="settings">Settings</h2>
+                <button class="config-close" onclick="closeConfig()">&times;</button>
+            </div>
+            <div class="config-tabs">
+                <button class="config-tab active" onclick="switchConfigTab('keys')" data-i18n="apiKeys">API Keys</button>
+                <button class="config-tab" onclick="switchConfigTab('settings')" data-i18n="appSettings">App Settings</button>
+                <button class="config-tab" onclick="switchConfigTab('status')" data-i18n="status">Status</button>
+            </div>
+            <div class="config-body">
+                <!-- Tab: API Keys -->
+                <div class="config-tab-content active" id="configTabKeys">
+                    <div class="config-section">
+                        <h4 data-i18n="llmProviders">LLM Providers</h4>
+                        <div id="keysLLM"></div>
+                    </div>
+                    <div class="config-section">
+                        <h4 data-i18n="integrations">Integrations</h4>
+                        <div id="keysIntegrations"></div>
+                    </div>
+                </div>
+                <!-- Tab: App Settings -->
+                <div class="config-tab-content" id="configTabSettings">
+                    <div class="config-field">
+                        <label data-i18n="provider">Provider</label>
+                        <select class="config-select" id="cfgProvider">
+                            <option value="">auto-detect</option>
+                            <option value="anthropic">anthropic</option>
+                            <option value="openai">openai</option>
+                            <option value="minimax">minimax</option>
+                        </select>
+                    </div>
+                    <div class="config-field">
+                        <label data-i18n="model">Model</label>
+                        <input class="config-input" id="cfgModel" type="text" placeholder="provider default">
+                    </div>
+                    <div class="config-field">
+                        <label data-i18n="temperature">Temperature</label>
+                        <div class="config-range-wrap">
+                            <input type="range" id="cfgTemp" min="0" max="1" step="0.1" value="0.7">
+                            <span class="range-val" id="cfgTempVal">0.7</span>
+                        </div>
+                    </div>
+                    <div class="config-field">
+                        <label data-i18n="maxTokens">Max Tokens</label>
+                        <input class="config-input" id="cfgMaxTokens" type="number" value="4096">
+                    </div>
+                    <div class="config-field">
+                        <label data-i18n="language">Language</label>
+                        <select class="config-select" id="cfgLanguage">
+                            <option value="en">English</option>
+                            <option value="pt-BR">Portugues (BR)</option>
+                            <option value="es">Espanol</option>
+                        </select>
+                    </div>
+                    <div class="config-field">
+                        <label data-i18n="dashboardPort">Dashboard Port</label>
+                        <input class="config-input" id="cfgPort" type="number" value="3001">
+                    </div>
+                    <button class="config-save-btn" onclick="saveSettings()" data-i18n="save">Save</button>
+                </div>
+                <!-- Tab: Status -->
+                <div class="config-tab-content" id="configTabStatus">
+                    <div id="configStatusList"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // WebSocket connection
+        // === i18n System ===
+        const TRANSLATIONS = {
+          en: {
+            connecting: 'Connecting...', connected: 'Connected', disconnected: 'Disconnected',
+            agents: 'Agents', waiting: 'Waiting',
+            research: 'Research', strategy: 'Strategy', creation: 'Creation', review: 'Review',
+            runSquad: 'Run Squad', console: 'Console',
+            agent: 'Agent', role: 'Role', currentTask: 'Current task:',
+            realTimeActivity: 'Real-Time Activity',
+            checkpoint: 'Checkpoint', approve: 'Approve', reject: 'Reject',
+            approved: 'Checkpoint approved', rejected: 'Checkpoint rejected',
+            idle: 'Idle', working: 'Working', done: 'Completed', error: 'Error',
+            connectedToServer: 'Connected to server',
+            connectionLost: 'Connection lost - reconnecting...',
+            squadLoaded: 'Squad "{name}" loaded',
+            processing: 'Processing...',
+            startingSquad: 'Starting squad execution...',
+            executingTask: 'Executing task...',
+            taskCompleted: 'Task completed!',
+            contentApprove: 'Content created. Approve to continue?',
+            settings: 'Settings', agentCatalog: 'Agent Catalog',
+            apiKeys: 'API Keys', appSettings: 'App Settings', status: 'Status',
+            save: 'Save', llmProviders: 'LLM Providers', integrations: 'Integrations',
+            provider: 'Provider', model: 'Model', temperature: 'Temperature',
+            maxTokens: 'Max Tokens', language: 'Language', dashboardPort: 'Dashboard Port',
+            searchAgents: 'Search agents...', close: 'Close',
+            keySaved: 'Key saved', keyRemoved: 'Key removed', settingsSaved: 'Settings saved',
+            configured: 'Configured', notConfigured: 'Not configured',
+            restartRequired: 'Restart required to apply',
+          },
+          'pt-BR': {
+            connecting: 'Conectando...', connected: 'Conectado', disconnected: 'Desconectado',
+            agents: 'Agentes', waiting: 'Aguardando',
+            research: 'Pesquisa', strategy: 'Estrategia', creation: 'Criacao', review: 'Revisao',
+            runSquad: 'Executar Squad', console: 'Console',
+            agent: 'Agente', role: 'Papel', currentTask: 'Tarefa atual:',
+            realTimeActivity: 'Atividade em Tempo Real',
+            checkpoint: 'Checkpoint', approve: 'Aprovar', reject: 'Rejeitar',
+            approved: 'Checkpoint aprovado', rejected: 'Checkpoint rejeitado',
+            idle: 'Ocioso', working: 'Trabalhando', done: 'Concluido', error: 'Erro',
+            connectedToServer: 'Conectado ao servidor',
+            connectionLost: 'Conexao perdida - reconectando...',
+            squadLoaded: 'Squad "{name}" carregado',
+            processing: 'Processando...',
+            startingSquad: 'Iniciando execucao do squad...',
+            executingTask: 'Executando tarefa...',
+            taskCompleted: 'Tarefa concluida!',
+            contentApprove: 'Conteudo criado. Aprovar para continuar?',
+            settings: 'Configuracoes', agentCatalog: 'Catalogo de Agentes',
+            apiKeys: 'Chaves de API', appSettings: 'Configuracoes do App', status: 'Status',
+            save: 'Salvar', llmProviders: 'Provedores de LLM', integrations: 'Integracoes',
+            provider: 'Provedor', model: 'Modelo', temperature: 'Temperatura',
+            maxTokens: 'Tokens Maximo', language: 'Idioma', dashboardPort: 'Porta do Dashboard',
+            searchAgents: 'Buscar agentes...', close: 'Fechar',
+            keySaved: 'Chave salva', keyRemoved: 'Chave removida', settingsSaved: 'Configuracoes salvas',
+            configured: 'Configurado', notConfigured: 'Nao configurado',
+            restartRequired: 'Reinicio necessario para aplicar',
+          }
+        };
+
+        let currentDashboardLang = localStorage.getItem('ocs-lang') || 'en';
+
+        function applyTranslations() {
+          const dict = TRANSLATIONS[currentDashboardLang] || TRANSLATIONS['en'];
+          document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.textContent = dict[key];
+          });
+          document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (dict[key]) el.placeholder = dict[key];
+          });
+        }
+
+        function t(key, params = {}) {
+          const dict = TRANSLATIONS[currentDashboardLang] || TRANSLATIONS['en'];
+          let text = dict[key] || key;
+          for (const [k, v] of Object.entries(params)) {
+            text = text.replace(`{${k}}`, v);
+          }
+          return text;
+        }
+
+        function toggleLanguage() {
+          currentDashboardLang = currentDashboardLang === 'en' ? 'pt-BR' : 'en';
+          localStorage.setItem('ocs-lang', currentDashboardLang);
+          document.getElementById('langToggle').textContent = currentDashboardLang === 'en' ? 'EN' : 'PT';
+          applyTranslations();
+        }
+
+        // === WebSocket connection ===
         let ws;
         let currentAgents = [];
         let logs = [];
-        
+
         function connect() {
             ws = new WebSocket('ws://localhost:3001');
             
             ws.onopen = () => {
                 document.getElementById('wsStatus').classList.add('connected');
-                document.getElementById('wsText').textContent = 'Conectado';
-                addLog('system', 'Conectado ao servidor');
+                document.getElementById('wsText').textContent = t('connected');
+                addLog('system', t('connectedToServer'));
             };
-            
+
             ws.onclose = () => {
                 document.getElementById('wsStatus').classList.remove('connected');
-                document.getElementById('wsText').textContent = 'Desconectado';
-                addLog('error', 'Connection lost - reconnecting...');
+                document.getElementById('wsText').textContent = t('disconnected');
+                addLog('error', t('connectionLost'));
                 setTimeout(connect, 3000);
             };
             
@@ -578,7 +1154,7 @@
         function loadSquad(squad) {
             currentAgents = squad.agents || [];
             renderAgents();
-            addLog('system', `Squad "${squad.name}" carregado`);
+            addLog('system', t('squadLoaded', { name: squad.name }));
         }
 
         function renderAgents() {
@@ -590,7 +1166,7 @@
                         <div class="agent-icon" style="background: var(--accent-dim)">${agent.icon}</div>
                         ${agent.name}
                     </div>
-                    <div class="status" id="status-${agent.id}">Aguardando</div>
+                    <div class="status" id="status-${agent.id}">${t('waiting')}</div>
                 </div>
             `).join('');
 
@@ -615,8 +1191,7 @@
             // Update sidebar
             const statusEl = document.getElementById(`status-${agentId}`);
             if (statusEl) {
-                const texts = { idle: 'Idle', working: 'Working', done: 'Completed', error: 'Error' };
-                statusEl.textContent = texts[status] || status;
+                statusEl.textContent = t(status) || status;
             }
             
             // Update dot
@@ -681,34 +1256,33 @@
         function approveCheckpoint() {
             document.getElementById('checkpointModal').classList.remove('show');
             ws.send(JSON.stringify({ type: 'checkpoint_response', approved: true }));
-            addLog('system', 'Checkpoint aprovado');
+            addLog('system', t('approved'));
         }
 
         function rejectCheckpoint() {
             document.getElementById('checkpointModal').classList.remove('show');
             ws.send(JSON.stringify({ type: 'checkpoint_response', approved: false }));
-            addLog('error', 'Checkpoint rejeitado');
+            addLog('error', t('rejected'));
         }
 
         function runDemo() {
-            addLog('system', 'Starting squad execution...');
-            
+            addLog('system', t('startingSquad'));
+
             // Simular pipeline
             const steps = ['researcher', 'strategist', 'writer', 'reviewer'];
-            
+
             steps.forEach((agentId, i) => {
                 setTimeout(() => {
-                    updateAgentStatus(agentId, 'working', 'Processando...');
-                    addLog('agent', `${agentId}: Executando tarefa...`);
-                    
+                    updateAgentStatus(agentId, 'working', t('processing'));
+                    addLog('agent', `${agentId}: ${t('executingTask')}`);
+
                     setTimeout(() => {
-                        updateAgentStatus(agentId, 'done', 'Completed');
-                        addLog('agent', `${agentId}: Task completed!`);
-                        
+                        updateAgentStatus(agentId, 'done', t('done'));
+                        addLog('agent', `${agentId}: ${t('taskCompleted')}`);
+
                         if (i === 0 || i === 2) {
-                            //Checkpoint after researcher and writer
                             setTimeout(() => {
-                                showCheckpoint({ message: 'Content created. Approve to continue?' });
+                                showCheckpoint({ message: t('contentApprove') });
                             }, 500);
                         }
                     }, 1500);
@@ -726,7 +1300,213 @@
             }
         });
 
-        // Conectar ao iniciar
+        // === Agent Catalog ===
+        let catalogData = null;
+
+        function toggleAgentsCatalog() {
+          const el = document.getElementById('agentsCatalog');
+          if (el.classList.contains('show')) {
+            closeAgentsCatalog();
+          } else {
+            openAgentsCatalog();
+          }
+        }
+
+        async function openAgentsCatalog() {
+          document.getElementById('agentsCatalog').classList.add('show');
+          if (!catalogData) {
+            try {
+              const res = await fetch('/api/agents');
+              catalogData = await res.json();
+            } catch (err) {
+              addLog('error', 'Failed to load agents: ' + err.message);
+              return;
+            }
+          }
+          renderCatalog(catalogData);
+          applyTranslations();
+        }
+
+        function closeAgentsCatalog() {
+          document.getElementById('agentsCatalog').classList.remove('show');
+        }
+
+        function renderCatalog(data) {
+          const body = document.getElementById('catalogBody');
+          const { agents, categories } = data;
+          let html = '';
+          for (const [category, agentIds] of Object.entries(categories)) {
+            const catAgents = agentIds.map(id => agents.find(a => a.id === id)).filter(Boolean);
+            if (catAgents.length === 0) continue;
+            html += `<div class="catalog-category" data-category="${category}"><h4>${category}</h4>`;
+            for (const agent of catAgents) {
+              html += `
+                <div class="catalog-agent" data-name="${agent.name.toLowerCase()}" data-desc="${agent.description.toLowerCase()}">
+                  <span class="catalog-agent-icon">${agent.icon || '🤖'}</span>
+                  <div class="catalog-agent-info">
+                    <div class="catalog-agent-name">${agent.name}</div>
+                    <div class="catalog-agent-desc">${agent.description}</div>
+                  </div>
+                </div>`;
+            }
+            html += '</div>';
+          }
+          body.innerHTML = html;
+        }
+
+        function filterAgents(query) {
+          const q = query.toLowerCase().trim();
+          document.querySelectorAll('.catalog-agent').forEach(el => {
+            const name = el.dataset.name || '';
+            const desc = el.dataset.desc || '';
+            el.style.display = (!q || name.includes(q) || desc.includes(q)) ? 'flex' : 'none';
+          });
+          document.querySelectorAll('.catalog-category').forEach(cat => {
+            const visible = cat.querySelectorAll('.catalog-agent[style*="flex"], .catalog-agent:not([style])');
+            const hasVisible = Array.from(cat.querySelectorAll('.catalog-agent')).some(a => a.style.display !== 'none');
+            cat.style.display = hasVisible ? 'block' : 'none';
+          });
+        }
+
+        // === Config Panel ===
+        const KEY_GROUPS = {
+          llm: ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'MINIMAX_API_KEY'],
+          integrations: ['INSTAGRAM_ACCESS_TOKEN', 'INSTAGRAM_USER_ID', 'IMGBB_API_KEY', 'APIFY_TOKEN']
+        };
+
+        function openConfig() {
+          document.getElementById('configModal').classList.add('show');
+          loadConfigData();
+          applyTranslations();
+        }
+
+        function closeConfig() {
+          document.getElementById('configModal').classList.remove('show');
+        }
+
+        function switchConfigTab(tab) {
+          document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.config-tab-content').forEach(t => t.classList.remove('active'));
+          const tabs = { keys: 'configTabKeys', settings: 'configTabSettings', status: 'configTabStatus' };
+          document.getElementById(tabs[tab]).classList.add('active');
+          event.target.classList.add('active');
+        }
+
+        async function loadConfigData() {
+          try {
+            const res = await fetch('/api/config');
+            const data = await res.json();
+            // Populate keys
+            renderKeyRows('keysLLM', KEY_GROUPS.llm, data.keys);
+            renderKeyRows('keysIntegrations', KEY_GROUPS.integrations, data.keys);
+            // Populate settings
+            const c = data.config;
+            document.getElementById('cfgProvider').value = c.provider || '';
+            document.getElementById('cfgModel').value = c.model || '';
+            document.getElementById('cfgTemp').value = c.temperature ?? 0.7;
+            document.getElementById('cfgTempVal').textContent = c.temperature ?? 0.7;
+            document.getElementById('cfgMaxTokens').value = c.maxTokens ?? 4096;
+            document.getElementById('cfgLanguage').value = c.language || 'pt-BR';
+            document.getElementById('cfgPort').value = c.dashboardPort ?? 3001;
+            // Populate status
+            renderStatusTab(data);
+          } catch (err) {
+            addLog('error', 'Failed to load config: ' + err.message);
+          }
+        }
+
+        function renderKeyRows(containerId, keyNames, keysData) {
+          const container = document.getElementById(containerId);
+          container.innerHTML = keyNames.map(keyName => {
+            const info = keysData[keyName] || {};
+            const statusClass = info.exists ? 'exists' : 'empty';
+            return `
+              <div class="config-key-row">
+                <label><span class="key-status ${statusClass}"></span>${keyName}</label>
+                <input type="password" id="key-${keyName}" placeholder="${info.masked || ''}">
+                <button class="config-btn-sm" onclick="saveKey('${keyName}')">${t('save')}</button>
+                ${info.exists ? `<button class="config-btn-sm danger" onclick="deleteKey('${keyName}')">✕</button>` : ''}
+              </div>`;
+          }).join('');
+        }
+
+        function renderStatusTab(data) {
+          const list = document.getElementById('configStatusList');
+          const keys = data.keys || {};
+          const cfg = data.config || {};
+          let html = '<div class="config-section"><h4>API Keys</h4>';
+          for (const [name, info] of Object.entries(keys)) {
+            const badge = info.exists
+              ? `<span class="badge ok">${t('configured')}</span>`
+              : `<span class="badge missing">${t('notConfigured')}</span>`;
+            html += `<div class="config-status-row"><span class="name">${name}</span>${badge}${info.masked ? `<span class="value">${info.masked}</span>` : ''}</div>`;
+          }
+          html += '</div><div class="config-section"><h4>' + t('appSettings') + '</h4>';
+          html += `<div class="config-status-row"><span class="name">${t('provider')}</span><span class="value">${cfg.provider || 'auto-detect'}</span></div>`;
+          html += `<div class="config-status-row"><span class="name">${t('model')}</span><span class="value">${cfg.model || 'default'}</span></div>`;
+          html += `<div class="config-status-row"><span class="name">${t('temperature')}</span><span class="value">${cfg.temperature ?? 0.7}</span></div>`;
+          html += `<div class="config-status-row"><span class="name">${t('language')}</span><span class="value">${cfg.language || 'pt-BR'}</span></div>`;
+          html += '</div>';
+          list.innerHTML = html;
+        }
+
+        async function saveKey(keyName) {
+          const input = document.getElementById('key-' + keyName);
+          const value = input.value.trim();
+          if (!value) return;
+          try {
+            await fetch('/api/keys', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key: keyName, value })
+            });
+            input.value = '';
+            addLog('system', t('keySaved') + ': ' + keyName);
+            loadConfigData();
+          } catch (err) {
+            addLog('error', 'Error saving key: ' + err.message);
+          }
+        }
+
+        async function deleteKey(keyName) {
+          try {
+            await fetch('/api/keys/' + encodeURIComponent(keyName), { method: 'DELETE' });
+            addLog('system', t('keyRemoved') + ': ' + keyName);
+            loadConfigData();
+          } catch (err) {
+            addLog('error', 'Error removing key: ' + err.message);
+          }
+        }
+
+        async function saveSettings() {
+          const config = {
+            provider: document.getElementById('cfgProvider').value || null,
+            model: document.getElementById('cfgModel').value || null,
+            temperature: parseFloat(document.getElementById('cfgTemp').value),
+            maxTokens: parseInt(document.getElementById('cfgMaxTokens').value, 10),
+            language: document.getElementById('cfgLanguage').value,
+            dashboardPort: parseInt(document.getElementById('cfgPort').value, 10),
+          };
+          try {
+            await fetch('/api/config', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(config)
+            });
+            addLog('system', t('settingsSaved'));
+          } catch (err) {
+            addLog('error', 'Error saving settings: ' + err.message);
+          }
+        }
+
+        // Temperature slider live update
+        document.getElementById('cfgTemp').addEventListener('input', (e) => {
+          document.getElementById('cfgTempVal').textContent = e.target.value;
+        });
+
+        // Init language and connect
+        document.getElementById('langToggle').textContent = currentDashboardLang === 'en' ? 'EN' : 'PT';
+        applyTranslations();
         connect();
     </script>
 </body>

@@ -3,7 +3,7 @@
  * Loads config from: env vars > openclawsquad.config.json > defaults
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const DEFAULTS = {
@@ -67,6 +67,25 @@ export function loadConfig(targetDir = process.cwd()) {
  */
 export function resetConfig() {
   _config = null;
+}
+
+/**
+ * Save configuration to openclawsquad.config.json
+ */
+export function saveConfig(targetDir, newConfig) {
+  const configPath = join(targetDir, 'openclawsquad.config.json');
+  let existing = {};
+  if (existsSync(configPath)) {
+    try {
+      existing = JSON.parse(readFileSync(configPath, 'utf-8'));
+    } catch {
+      // Invalid existing config, overwrite
+    }
+  }
+  const merged = { ...existing, ...newConfig };
+  writeFileSync(configPath, JSON.stringify(merged, null, 2), 'utf-8');
+  resetConfig();
+  return merged;
 }
 
 /**
