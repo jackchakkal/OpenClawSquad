@@ -6,7 +6,7 @@
 import { BaseLLMProvider } from './base.js';
 
 const BASE_URL = 'https://api.minimax.io/v1';
-const DEFAULT_MODEL = 'M2.7';
+const DEFAULT_MODEL = 'MiniMax-M2.7';
 
 export class MinimaxProvider extends BaseLLMProvider {
   constructor(apiKey) {

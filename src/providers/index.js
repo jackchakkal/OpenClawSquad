@@ -1,7 +1,7 @@
 /**
  * LLM Provider Registry & Factory
  * Auto-detects available provider based on environment variables.
- * Priority: MINIMAX > OPENAI > ANTHROPIC
+ * Priority: ANTHROPIC > OPENAI > MINIMAX (override with OPENCLAWSQUAD_PROVIDER)
  */
 
 import createMinimaxProvider from './minimax.js';
