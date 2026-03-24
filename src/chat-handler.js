@@ -211,14 +211,13 @@ async function executeAction(action, broadcastFn) {
         }
         // Run in background — import pipeline runner dynamically
         const { PipelineRunner } = await import('./pipeline-runner.js');
-        const runner = new PipelineRunner();
-        const runId = `run_${Date.now()}`;
+        const runner = new PipelineRunner(action.name, process.cwd());
+        runner.onStatusChange = (event) => {
+          if (broadcastFn) broadcastFn({ type: 'agent_updated', data: event });
+        };
+        const runId = runner.runId;
         // Fire and forget
-        runner.run(action.name, action.prompt || '', {
-          onStatus: (event) => {
-            if (broadcastFn) broadcastFn({ type: 'agent_updated', data: event });
-          }
-        }).catch(err => {
+        runner.execute(action.prompt || '').catch(err => {
           if (broadcastFn) broadcastFn({ type: 'activity', data: { agent: 'System', message: `Squad run failed: ${err.message}` } });
         });
         return { success: true, message: `Squad "${action.name}" started (ID: ${runId})` };
