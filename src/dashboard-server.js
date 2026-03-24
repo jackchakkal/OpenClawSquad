@@ -622,12 +622,11 @@ function createDashboardServer(port = 3001) {
         (async () => {
           try {
             const { PipelineRunner } = await import('./pipeline-runner.js');
-            const runner = new PipelineRunner({
-              onStatus: (event) => {
-                if (event.agentId) updateAgentStatus(event.agentId, event.status || 'working', event.task || '');
-              }
-            });
-            await runner.run(squadName, prompt);
+            const runner = new PipelineRunner(squadName, _targetDir);
+            runner.onStatusChange = (event) => {
+              if (event.agentId) updateAgentStatus(event.agentId, event.status || 'working', event.task || '');
+            };
+            await runner.execute(prompt);
             addActivity('System', `Squad "${squadName}" completed`);
           } catch (err) {
             addActivity('System', `Squad "${squadName}" failed: ${err.message}`);
