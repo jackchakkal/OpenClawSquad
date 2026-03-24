@@ -7,11 +7,12 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
-import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, unlinkSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, unlinkSync, statSync, rmSync } from 'fs';
 import { join, extname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { loadConfig, resetConfig, saveConfig } from './config.js';
 import { loadGlobalKeys, saveGlobalKey, removeGlobalKey, applyGlobalKeys } from './keys.js';
+import { handleChat, runHealthCheck } from './chat-handler.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -475,6 +476,199 @@ function createDashboardServer(port = 3001) {
       } catch (err) {
         res.writeHead(500);
         res.end('Error serving file');
+      }
+      return;
+    }
+
+    // === Health Check API ===
+    if (req.url === '/api/health' && req.method === 'GET') {
+      try {
+        const health = await runHealthCheck();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(health));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // === Squads CRUD API ===
+    const squadsBaseDir = join(__dirname, '..', 'squads');
+
+    // GET /api/squads - list all squads
+    if (req.url === '/api/squads' && req.method === 'GET') {
+      try {
+        const squads = [];
+        if (existsSync(squadsBaseDir)) {
+          const entries = readdirSync(squadsBaseDir);
+          for (const entry of entries) {
+            const squadFile = join(squadsBaseDir, entry, 'squad.json');
+            if (existsSync(squadFile)) {
+              try {
+                const data = JSON.parse(readFileSync(squadFile, 'utf-8'));
+                squads.push({ name: entry, ...data });
+              } catch { /* skip invalid */ }
+            }
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ squads }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // POST /api/squads - create new squad
+    if (req.url === '/api/squads' && req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        const { name, description, agents, pipeline } = body;
+        if (!name || !/^[a-zA-Z0-9_-]+$/.test(name)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid squad name' }));
+          return;
+        }
+        if (!agents || !Array.isArray(agents) || agents.length === 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Squad must have at least one agent' }));
+          return;
+        }
+        if (!pipeline || !Array.isArray(pipeline) || pipeline.length === 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Squad must have at least one pipeline step' }));
+          return;
+        }
+        const squadDir = join(squadsBaseDir, name);
+        if (!existsSync(squadDir)) mkdirSync(squadDir, { recursive: true });
+        const squadFile = join(squadDir, 'squad.json');
+        const squadData = { name, description: description || '', agents, pipeline };
+        writeFileSync(squadFile, JSON.stringify(squadData, null, 2), 'utf-8');
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, name }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // PUT /api/squads/:name - update squad
+    if (req.url.startsWith('/api/squads/') && req.method === 'PUT' && !req.url.includes('/run')) {
+      try {
+        const squadName = decodeURIComponent(req.url.split('/api/squads/')[1]);
+        const squadFile = join(squadsBaseDir, squadName, 'squad.json');
+        if (!existsSync(squadFile)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Squad not found' }));
+          return;
+        }
+        const body = await parseBody(req);
+        const existing = JSON.parse(readFileSync(squadFile, 'utf-8'));
+        const updated = { ...existing, ...body, name: squadName };
+        writeFileSync(squadFile, JSON.stringify(updated, null, 2), 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // DELETE /api/squads/:name - delete squad
+    if (req.url.startsWith('/api/squads/') && req.method === 'DELETE') {
+      try {
+        const squadName = decodeURIComponent(req.url.split('/api/squads/')[1]);
+        const squadFile = join(squadsBaseDir, squadName, 'squad.json');
+        if (!existsSync(squadFile)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Squad not found' }));
+          return;
+        }
+        unlinkSync(squadFile);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // POST /api/squads/:name/run - run a squad
+    if (req.url.match(/^\/api\/squads\/[^/]+\/run$/) && req.method === 'POST') {
+      try {
+        const parts = req.url.split('/');
+        const squadName = decodeURIComponent(parts[3]);
+        const squadFile = join(squadsBaseDir, squadName, 'squad.json');
+        if (!existsSync(squadFile)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Squad not found' }));
+          return;
+        }
+        const body = await parseBody(req).catch(() => ({}));
+        const prompt = body.prompt || '';
+        const runId = `run_${Date.now()}`;
+
+        // Start squad in dashboard state
+        const squadData = JSON.parse(readFileSync(squadFile, 'utf-8'));
+        startSquad(squadName, squadData.agents || []);
+        addActivity('System', `Squad "${squadName}" started via dashboard`);
+
+        // Fire and forget — run pipeline in background
+        (async () => {
+          try {
+            const { PipelineRunner } = await import('./pipeline-runner.js');
+            const runner = new PipelineRunner({
+              onStatus: (event) => {
+                if (event.agentId) updateAgentStatus(event.agentId, event.status || 'working', event.task || '');
+              }
+            });
+            await runner.run(squadName, prompt);
+            addActivity('System', `Squad "${squadName}" completed`);
+          } catch (err) {
+            addActivity('System', `Squad "${squadName}" failed: ${err.message}`);
+          }
+        })();
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ started: true, runId, squad: squadName }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // === Chat API ===
+    if (req.url === '/api/chat' && req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        const { message, history } = body;
+        if (!message) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing message' }));
+          return;
+        }
+        const result = await handleChat({
+          message,
+          history: history || [],
+          broadcastFn: broadcast
+        });
+        // If an action was executed, broadcast activity
+        for (const exec of result.executed || []) {
+          if (exec.success) {
+            addActivity('Assistant', exec.message);
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
       }
       return;
     }
