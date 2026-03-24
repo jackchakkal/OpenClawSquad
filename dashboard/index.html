@@ -2261,6 +2261,11 @@
           reader.onload = function(e) {
             try {
               const layout = JSON.parse(e.target.result);
+              // Validate required structure
+              if (!layout.font && !layout.colors && !layout.dimensions) {
+                addLog('error', 'Invalid layout file: missing font, colors, or dimensions');
+                return;
+              }
               currentLayoutId = layout.id || 'imported-layout';
 
               // Fill form from imported layout

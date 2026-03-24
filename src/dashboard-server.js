@@ -308,13 +308,32 @@ function createDashboardServer(port = 3001) {
       return;
     }
 
+    // Layout validation helper
+    const validateLayout = (layout) => {
+      const errors = [];
+      if (!layout.id) errors.push('Missing id');
+      if (!layout.name) errors.push('Missing name');
+      if (layout.dimensions && (typeof layout.dimensions.width !== 'number' || typeof layout.dimensions.height !== 'number')) {
+        errors.push('dimensions.width and dimensions.height must be numbers');
+      }
+      if (layout.font) {
+        if (layout.font.textSize && (layout.font.textSize < 10 || layout.font.textSize > 300)) errors.push('font.textSize must be between 10-300');
+        if (layout.font.weight && ![400,500,600,700,800,900].includes(layout.font.weight)) errors.push('font.weight must be 400-900');
+      }
+      if (layout.colors && layout.colors.bgGradient && !Array.isArray(layout.colors.bgGradient)) {
+        errors.push('colors.bgGradient must be an array');
+      }
+      return errors;
+    };
+
     // POST /api/layouts - create new layout
     if (req.url === '/api/layouts' && req.method === 'POST') {
       try {
         const body = await parseBody(req);
-        if (!body.id || !body.name) {
+        const validationErrors = validateLayout(body);
+        if (validationErrors.length > 0) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing id or name' }));
+          res.end(JSON.stringify({ error: validationErrors.join(', ') }));
           return;
         }
         if (!existsSync(layoutsDir)) mkdirSync(layoutsDir, { recursive: true });
@@ -342,6 +361,12 @@ function createDashboardServer(port = 3001) {
         }
         const body = await parseBody(req);
         body.id = layoutId;
+        const validationErrors = validateLayout(body);
+        if (validationErrors.length > 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: validationErrors.join(', ') }));
+          return;
+        }
         writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));

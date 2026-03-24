@@ -1,0 +1,54 @@
+{
+  "id": "viral-bold",
+  "name": "Viral Bold",
+  "category": "Viral",
+  "version": "1.0.0",
+  "dimensions": {
+    "width": 1080,
+    "height": 1440
+  },
+  "font": {
+    "family": "Poppins",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap",
+    "textSize": 90,
+    "emojiSize": 140,
+    "weight": 800,
+    "lineHeight": 1.1
+  },
+  "colors": {
+    "text": "#ffffff",
+    "accent": "#ff6b00",
+    "accentLight": "#ffaa33",
+    "bgGradient": ["#1a0a2e", "#2d1b4e", "#0a0a0a"],
+    "bgGradientAngle": 160,
+    "blobColor1": "#ff6b00",
+    "blobColor2": "#6b00ff",
+    "dotInactive": "rgba(255,255,255,0.25)"
+  },
+  "elements": {
+    "slideNumber": true,
+    "slideNumberStyle": {
+      "fontSize": 220,
+      "opacity": 0.06
+    },
+    "emoji": true,
+    "progressDots": true,
+    "handle": "@seuhandle",
+    "handleColor": "#ff6b00",
+    "blobs": true,
+    "blobBlur": 120,
+    "blobOpacity": 0.5
+  },
+  "cta": {
+    "enabled": true,
+    "text": "COMPARTILHE AGORA",
+    "emoji": "🔥",
+    "bgGradient": ["#ff6b00", "#ffaa33"],
+    "borderRadius": 20
+  },
+  "padding": 70,
+  "slideNumPosition": {
+    "top": 50,
+    "left": 50
+  }
+}

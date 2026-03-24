@@ -1,0 +1,54 @@
+{
+  "id": "educativo-clean",
+  "name": "Educativo Clean",
+  "category": "Educativo",
+  "version": "1.0.0",
+  "dimensions": {
+    "width": 1080,
+    "height": 1440
+  },
+  "font": {
+    "family": "Inter",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+    "textSize": 68,
+    "emojiSize": 100,
+    "weight": 600,
+    "lineHeight": 1.3
+  },
+  "colors": {
+    "text": "#e8e8e8",
+    "accent": "#4a9eff",
+    "accentLight": "#7bb8ff",
+    "bgGradient": ["#0d1117", "#161b22", "#1c2333"],
+    "bgGradientAngle": 180,
+    "blobColor1": "#4a9eff",
+    "blobColor2": "#1c2333",
+    "dotInactive": "rgba(255,255,255,0.15)"
+  },
+  "elements": {
+    "slideNumber": true,
+    "slideNumberStyle": {
+      "fontSize": 160,
+      "opacity": 0.03
+    },
+    "emoji": true,
+    "progressDots": true,
+    "handle": "@seuhandle",
+    "handleColor": "#4a9eff",
+    "blobs": false,
+    "blobBlur": 100,
+    "blobOpacity": 0.3
+  },
+  "cta": {
+    "enabled": true,
+    "text": "SALVE PARA ESTUDAR DEPOIS",
+    "emoji": "📚",
+    "bgGradient": ["#4a9eff", "#7bb8ff"],
+    "borderRadius": 12
+  },
+  "padding": 90,
+  "slideNumPosition": {
+    "top": 60,
+    "left": 60
+  }
+}
