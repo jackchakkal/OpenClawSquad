@@ -1,0 +1,54 @@
+{
+  "id": "mindset-viral",
+  "name": "Mindset Viral",
+  "category": "Mindset",
+  "version": "1.0.0",
+  "dimensions": {
+    "width": 1080,
+    "height": 1440
+  },
+  "font": {
+    "family": "Space Grotesk",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap",
+    "textSize": 75,
+    "emojiSize": 120,
+    "weight": 700,
+    "lineHeight": 1.2
+  },
+  "colors": {
+    "text": "#ffffff",
+    "accent": "#e94560",
+    "accentLight": "#ff6b8a",
+    "bgGradient": ["#1a1a2e", "#16213e", "#0f3460"],
+    "bgGradientAngle": 135,
+    "blobColor1": "#e94560",
+    "blobColor2": "#0f3460",
+    "dotInactive": "rgba(255,255,255,0.2)"
+  },
+  "elements": {
+    "slideNumber": true,
+    "slideNumberStyle": {
+      "fontSize": 180,
+      "opacity": 0.05
+    },
+    "emoji": true,
+    "progressDots": true,
+    "handle": "@seuhandle",
+    "handleColor": "#e94560",
+    "blobs": true,
+    "blobBlur": 100,
+    "blobOpacity": 0.4
+  },
+  "cta": {
+    "enabled": true,
+    "text": "SALVE ESTE CARROSSEL",
+    "emoji": "\ud83d\udcbe",
+    "bgGradient": ["#e94560", "#ff6b8a"],
+    "borderRadius": 16
+  },
+  "padding": 80,
+  "slideNumPosition": {
+    "top": 60,
+    "left": 60
+  }
+}

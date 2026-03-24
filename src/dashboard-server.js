@@ -7,8 +7,8 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
-import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join, extname } from 'path';
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, unlinkSync, statSync } from 'fs';
+import { join, extname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { loadConfig, resetConfig, saveConfig } from './config.js';
 import { loadGlobalKeys, saveGlobalKey, removeGlobalKey, applyGlobalKeys } from './keys.js';
@@ -146,7 +146,7 @@ function createDashboardServer(port = 3001) {
   const server = http.createServer(async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
@@ -261,6 +261,195 @@ function createDashboardServer(port = 3001) {
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // === Layouts API ===
+    const layoutsDir = join(__dirname, '..', 'layouts');
+
+    // GET /api/layouts - list all layouts
+    if (req.url === '/api/layouts' && req.method === 'GET') {
+      try {
+        if (!existsSync(layoutsDir)) mkdirSync(layoutsDir, { recursive: true });
+        const files = readdirSync(layoutsDir).filter(f => f.endsWith('.json'));
+        const layouts = files.map(f => {
+          try {
+            const data = JSON.parse(readFileSync(join(layoutsDir, f), 'utf-8'));
+            return { id: data.id || f.replace('.json', ''), name: data.name, category: data.category, version: data.version };
+          } catch { return null; }
+        }).filter(Boolean);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ layouts }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // GET /api/layouts/:id - get specific layout
+    if (req.url.startsWith('/api/layouts/') && req.method === 'GET') {
+      try {
+        const layoutId = decodeURIComponent(req.url.split('/api/layouts/')[1]);
+        const filePath = join(layoutsDir, `${layoutId}.json`);
+        if (!existsSync(filePath)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Layout not found' }));
+          return;
+        }
+        const data = readFileSync(filePath, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(data);
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // POST /api/layouts - create new layout
+    if (req.url === '/api/layouts' && req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        if (!body.id || !body.name) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing id or name' }));
+          return;
+        }
+        if (!existsSync(layoutsDir)) mkdirSync(layoutsDir, { recursive: true });
+        const sanitizedId = body.id.replace(/[^a-zA-Z0-9_-]/g, '-');
+        const filePath = join(layoutsDir, `${sanitizedId}.json`);
+        writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, id: sanitizedId }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // PUT /api/layouts/:id - update layout
+    if (req.url.startsWith('/api/layouts/') && req.method === 'PUT') {
+      try {
+        const layoutId = decodeURIComponent(req.url.split('/api/layouts/')[1]);
+        const filePath = join(layoutsDir, `${layoutId}.json`);
+        if (!existsSync(filePath)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Layout not found' }));
+          return;
+        }
+        const body = await parseBody(req);
+        body.id = layoutId;
+        writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // DELETE /api/layouts/:id - delete layout
+    if (req.url.startsWith('/api/layouts/') && req.method === 'DELETE') {
+      try {
+        const layoutId = decodeURIComponent(req.url.split('/api/layouts/')[1]);
+        const filePath = join(layoutsDir, `${layoutId}.json`);
+        if (!existsSync(filePath)) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Layout not found' }));
+          return;
+        }
+        unlinkSync(filePath);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // === Carousels API ===
+    const squadsDir = join(__dirname, '..', 'squads');
+
+    // GET /api/carousels - list generated carousels from squad outputs
+    if (req.url === '/api/carousels' && req.method === 'GET') {
+      try {
+        const carousels = [];
+        if (existsSync(squadsDir)) {
+          const squadDirs = readdirSync(squadsDir).filter(d => {
+            const p = join(squadsDir, d);
+            return existsSync(p) && statSync(p).isDirectory();
+          });
+          for (const squad of squadDirs) {
+            const outputDir = join(squadsDir, squad, 'output');
+            if (!existsSync(outputDir)) continue;
+            // Scan for slide PNG files
+            const scanDir = (dir, prefix) => {
+              if (!existsSync(dir)) return;
+              const files = readdirSync(dir);
+              const slides = files.filter(f => /\.(png|jpg|jpeg)$/i.test(f)).sort();
+              if (slides.length > 0) {
+                carousels.push({
+                  id: `${squad}/${prefix || ''}`,
+                  squad,
+                  name: prefix || squad,
+                  slides: slides.map(f => ({
+                    filename: f,
+                    url: `/api/carousels/${squad}/${prefix ? prefix + '/' : ''}${f}`
+                  })),
+                  slideCount: slides.length
+                });
+              }
+              // Check subdirectories (e.g., output/slides/)
+              const subdirs = files.filter(f => {
+                const p = join(dir, f);
+                return existsSync(p) && statSync(p).isDirectory();
+              });
+              for (const sub of subdirs) {
+                scanDir(join(dir, sub), prefix ? `${prefix}/${sub}` : sub);
+              }
+            };
+            scanDir(outputDir, '');
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ carousels }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+      return;
+    }
+
+    // GET /api/carousels/:squad/... - serve carousel image file
+    if (req.url.startsWith('/api/carousels/') && req.method === 'GET') {
+      try {
+        const relPath = decodeURIComponent(req.url.replace('/api/carousels/', ''));
+        const imgPath = join(squadsDir, relPath, '..', '..', 'output', relPath.split('/').slice(1).join('/'));
+        // Rebuild proper path: /api/carousels/squadName/subpath/file.png -> squads/squadName/output/subpath/file.png
+        const parts = relPath.split('/');
+        const squadName = parts[0];
+        const rest = parts.slice(1).join('/');
+        const fullPath = join(squadsDir, squadName, 'output', rest);
+        if (!existsSync(fullPath)) {
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
+        const ext = extname(fullPath);
+        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Disposition': `inline; filename="${basename(fullPath)}"`
+        });
+        res.end(readFileSync(fullPath));
+      } catch (err) {
+        res.writeHead(500);
+        res.end('Error serving file');
       }
       return;
     }
