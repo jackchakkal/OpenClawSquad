@@ -1,6 +1,6 @@
 {
   "name": "openclawsquad",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Multi-agent orchestration framework - open source alternative to opensquad with IDE integrations, WebSocket dashboard, and more",
   "type": "module",
   "main": "src/index.js",
