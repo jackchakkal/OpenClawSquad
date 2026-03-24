@@ -656,6 +656,160 @@
         }
         .preset-card .preset-actions { display: flex; gap: 8px; }
 
+        /* Carousel Viewer */
+        .viewer-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-tag {
+            padding: 6px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 20px;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-tag:hover { color: var(--text); border-color: var(--accent); }
+        .filter-tag.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+        .viewer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 20px;
+        }
+        .carousel-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-dim);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .carousel-card:hover { border-color: var(--accent); }
+
+        .carousel-card-header {
+            padding: 16px 20px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carousel-card-header h3 { font-size: 15px; color: var(--text); margin: 0; }
+        .carousel-card-header .slide-count {
+            font-size: 12px;
+            color: var(--accent);
+            background: var(--accent-dim);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        .carousel-slides-strip {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 8px;
+            padding: 0 20px 12px;
+            position: relative;
+        }
+        .carousel-slides-strip::-webkit-scrollbar { height: 6px; }
+        .carousel-slides-strip::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 3px; }
+        .carousel-slides-strip::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+        .slide-thumb {
+            flex-shrink: 0;
+            width: 120px;
+            height: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            scroll-snap-align: start;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .slide-thumb:hover { border-color: var(--accent); }
+        .slide-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .slide-thumb .slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .slide-thumb:hover .slide-overlay { opacity: 1; }
+        .slide-overlay button {
+            background: var(--accent);
+            border: none;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .carousel-card-footer {
+            padding: 12px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--accent-dim);
+        }
+        .carousel-card-footer .squad-name {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        .btn-download-all {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #e94560, #ff6b8a);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-download-all:hover { opacity: 0.85; }
+
+        .viewer-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+        .viewer-empty span { font-size: 48px; display: block; margin-bottom: 16px; }
+
+        .slide-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 20px 8px;
+        }
+        .slide-nav button {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-dim);
+            color: var(--text-dim);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .slide-nav button:hover { color: var(--text); border-color: var(--accent); }
+
         /* Config Modal */
         .config-modal {
             position: fixed;
@@ -1296,7 +1450,14 @@
                 </div>
                 <!-- VIEWER TAB -->
                 <div class="carousel-tab-content" id="carouselTabViewer">
-                    <p data-i18n="viewerComingSoon" style="color:var(--text-dim);text-align:center;padding:40px;">Carousel Viewer — coming in Phase 3</p>
+                    <div class="viewer-filters">
+                        <button class="filter-tag active" onclick="filterCarousels('all')" data-i18n="allCategories">All</button>
+                        <button class="filter-tag" onclick="filterCarousels('mindset')">Mindset</button>
+                        <button class="filter-tag" onclick="filterCarousels('viral')">Viral</button>
+                        <button class="filter-tag" onclick="filterCarousels('educativo')">Educativo</button>
+                        <button class="filter-tag" onclick="filterCarousels('reflexao')">Reflexao</button>
+                    </div>
+                    <div class="viewer-grid" id="viewerGrid"></div>
                 </div>
             </div>
         </div>
@@ -1337,7 +1498,8 @@
             elements: 'Elements', contentSettings: 'Content', livePreview: 'Live Preview',
             saveLayout: 'Save Layout', layoutSaved: 'Layout saved!', layoutDeleted: 'Layout deleted',
             presets: 'Presets', editor: 'Editor', viewer: 'Viewer',
-            viewerComingSoon: 'Carousel Viewer — coming in Phase 3',
+            allCategories: 'All', downloadSlide: 'Download', downloadAll: 'Download All',
+            slides: 'slides', noCarouselsFound: 'No carousels found. Generate one using the squad pipeline.',
           },
           'pt-BR': {
             connecting: 'Conectando...', connected: 'Conectado', disconnected: 'Desconectado',
@@ -1371,7 +1533,8 @@
             elements: 'Elementos', contentSettings: 'Conteudo', livePreview: 'Preview ao Vivo',
             saveLayout: 'Salvar Layout', layoutSaved: 'Layout salvo!', layoutDeleted: 'Layout removido',
             presets: 'Presets', editor: 'Editor', viewer: 'Visualizador',
-            viewerComingSoon: 'Visualizador de Carrossel — em breve na Fase 3',
+            allCategories: 'Todos', downloadSlide: 'Baixar', downloadAll: 'Baixar Todos',
+            slides: 'slides', noCarouselsFound: 'Nenhum carrossel encontrado. Gere um usando o pipeline do squad.',
           }
         };
 
@@ -1828,6 +1991,7 @@
           const tabs = { presets: 'carouselTabPresets', editor: 'carouselTabEditor', viewer: 'carouselTabViewer' };
           document.getElementById(tabs[tab]).classList.add('active');
           event.target.classList.add('active');
+          if (tab === 'viewer') loadCarousels();
         }
 
         async function loadPresets() {
@@ -2136,6 +2300,94 @@
           };
           reader.readAsText(file);
           event.target.value = '';
+        }
+
+        // === Carousel Viewer ===
+        let allCarousels = [];
+        let currentFilter = 'all';
+
+        async function loadCarousels() {
+          try {
+            const res = await fetch('/api/carousels');
+            const data = await res.json();
+            allCarousels = data.carousels || [];
+            renderCarouselGrid();
+          } catch (err) {
+            console.error('Failed to load carousels:', err);
+          }
+        }
+
+        function filterCarousels(category) {
+          currentFilter = category;
+          document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+          event.target.classList.add('active');
+          renderCarouselGrid();
+        }
+
+        function renderCarouselGrid() {
+          const grid = document.getElementById('viewerGrid');
+          let filtered = allCarousels;
+          if (currentFilter !== 'all') {
+            filtered = allCarousels.filter(c => {
+              const name = (c.name || c.squad || '').toLowerCase();
+              return name.includes(currentFilter.toLowerCase());
+            });
+          }
+
+          if (filtered.length === 0) {
+            grid.innerHTML = `<div class="viewer-empty"><span>📭</span><p>${t('noCarouselsFound')}</p></div>`;
+            return;
+          }
+
+          grid.innerHTML = filtered.map((c, idx) => `
+            <div class="carousel-card">
+              <div class="carousel-card-header">
+                <h3>${c.name || c.squad}</h3>
+                <span class="slide-count">${c.slideCount} ${t('slides')}</span>
+              </div>
+              <div class="slide-nav">
+                <button onclick="scrollStrip('strip-${idx}', -1)">◀</button>
+                <button onclick="scrollStrip('strip-${idx}', 1)">▶</button>
+              </div>
+              <div class="carousel-slides-strip" id="strip-${idx}">
+                ${c.slides.map(s => `
+                  <div class="slide-thumb">
+                    <img src="${s.url}" alt="${s.filename}" loading="lazy">
+                    <div class="slide-overlay">
+                      <button onclick="downloadSlide('${s.url}', '${s.filename}')">${t('downloadSlide')}</button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="carousel-card-footer">
+                <span class="squad-name">📁 ${c.squad}</span>
+                <button class="btn-download-all" onclick="downloadAllSlides(${idx})">💾 ${t('downloadAll')}</button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        function scrollStrip(id, dir) {
+          const strip = document.getElementById(id);
+          if (strip) strip.scrollBy({ left: dir * 260, behavior: 'smooth' });
+        }
+
+        function downloadSlide(url, filename) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+        }
+
+        async function downloadAllSlides(idx) {
+          const filtered = currentFilter === 'all' ? allCarousels :
+            allCarousels.filter(c => (c.name || c.squad || '').toLowerCase().includes(currentFilter.toLowerCase()));
+          const carousel = filtered[idx];
+          if (!carousel) return;
+          for (const slide of carousel.slides) {
+            downloadSlide(slide.url, slide.filename);
+            await new Promise(r => setTimeout(r, 300));
+          }
         }
 
         // Temperature slider live update
